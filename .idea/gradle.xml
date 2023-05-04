@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/core-common" />
+            <option value="$PROJECT_DIR$/core-data" />
+            <option value="$PROJECT_DIR$/core-localization" />
+            <option value="$PROJECT_DIR$/core-persistence" />
+            <option value="$PROJECT_DIR$/core-repository" />
+            <option value="$PROJECT_DIR$/feature-align" />
+            <option value="$PROJECT_DIR$/feature-main" />
+            <option value="$PROJECT_DIR$/feature-main/intro" />
+            <option value="$PROJECT_DIR$/feature-project" />
+            <option value="$PROJECT_DIR$/feature-project/create" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
