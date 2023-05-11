@@ -7,19 +7,19 @@ This project is still under active development so do not expect a finished and p
 
 Welcome screen
 
-<img width="912" alt="welcome_screen" src="https://github.com/diegoberaldin/MetaLine/assets/2738294/b1fb0b3f-97dc-4cef-8692-feb89b8776f5">
+<img width="912" alt="welcome_screen" src="https://github.com/diegoberaldin/MetaLine/assets/2738294/dec48fe8-7ac8-4e78-b9b1-04196530805d">
 
 Project screen
 
-<img width="912" alt="project_screen" src="https://github.com/diegoberaldin/MetaLine/assets/2738294/6303828e-38d2-4b15-9e51-d634bc23179a">
+<img width="912" alt="project_screen" src="https://github.com/diegoberaldin/MetaLine/assets/2738294/55669379-e9a6-4e58-9163-f87701a88a30">
 
 Create project dialog
 
-<img width="912" alt="create_project_dialog" src="https://github.com/diegoberaldin/MetaLine/assets/2738294/eeeb0d20-1298-44e0-a65d-c8cc680b1c3a">
+<img width="912" alt="create_project_dialog" src="https://github.com/diegoberaldin/MetaLine/assets/2738294/10abb69b-7610-486e-97f3-16e2511078c7">
 
 Main alignment screen 
 
-<img width="912" alt="alignment_screen" src="https://github.com/diegoberaldin/MetaLine/assets/2738294/4b576690-35b7-48de-b032-f9da22d98166">
+<img width="912" alt="alignment_screen" src="https://github.com/diegoberaldin/MetaLine/assets/2738294/d3aee563-f9e1-4d3d-ab49-d1acb8d6413f">
 
 ## Trivia
 
