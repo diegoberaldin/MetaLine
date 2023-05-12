@@ -318,5 +318,33 @@
   {
     "key": "sidebar_title_project_files",
     "value": "File di progetto"
+  },
+  {
+    "key": "button_close",
+    "value": "Chiudi"
+  },
+  {
+    "key": "dialog_title_statistics",
+    "value": "Statistiche di progetto"
+  },
+  {
+    "key": "dialog_statistics_section_general",
+    "value": "Generali"
+  },
+  {
+    "key": "dialog_statistics_section_file_pairs",
+    "value": "File di progetto"
+  },
+  {
+    "key": "dialog_statistics_item_total_file_pairs",
+    "value": "Coppie di file"
+  },
+  {
+    "key": "dialog_statistics_item_translation_units",
+    "value": "Unità di traduzione"
+  },
+  {
+    "key": "dialog_statistics_item_completion",
+    "value": "Completamento"
   }
 ]

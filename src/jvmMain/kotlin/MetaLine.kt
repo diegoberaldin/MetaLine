@@ -27,6 +27,7 @@ import org.koin.java.KoinJavaComponent.inject
 import persistence.di.persistenceModule
 import project.di.projectModule
 import projectcreate.ui.dialog.CreateProjectDialog
+import projectstatistics.ui.dialog.StatisticsDialog
 import repository.repositoryModule
 import usecase.useCaseModule
 import java.util.*
@@ -72,6 +73,9 @@ fun main() = application {
         var editDialogOpen by remember {
             mutableStateOf(false)
         }
+        var statisticsDialogOpen by remember {
+            mutableStateOf(false)
+        }
         var exportDialogOpen by remember {
             mutableStateOf(false)
         }
@@ -105,8 +109,11 @@ fun main() = application {
                     mainViewModel.closeProject()
                 }
                 Separator()
-                Item(text = "menu_project_statistics".localized()) {
-                    // TODO
+                Item(
+                    text = "menu_project_statistics".localized(),
+                    enabled = mainUiState.project != null,
+                ) {
+                    statisticsDialogOpen = true
                 }
                 Separator()
                 Item(
@@ -187,6 +194,17 @@ fun main() = application {
                     editDialogOpen = false
                 },
             )
+        }
+
+        if (statisticsDialogOpen) {
+            mainUiState.project?.also {
+                StatisticsDialog(
+                    project = it,
+                    onClose = {
+                        statisticsDialogOpen = false
+                    },
+                )
+            }
         }
 
         if (exportDialogOpen) {
