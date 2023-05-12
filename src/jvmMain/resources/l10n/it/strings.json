@@ -1,0 +1,322 @@
+[
+  {
+    "key": "app_name",
+    "value": "MetaLine"
+  },
+  {
+    "key": "app_intro_title",
+    "value": "Grazie per utilizzare MetaLine!"
+  },
+  {
+    "key": "app_intro",
+    "value": "Apri un progetto di allineamento selezionando una delle seguenti voci."
+  },
+  {
+    "key": "app_intro_empty",
+    "value": "Sembra che tu non abbia ancora nessun progetto.\nPuoi crearne uno utilizzando il menu \"Project > New…\" per iniziare."
+  },
+  {
+    "key": "button_ok",
+    "value": "OK"
+  },
+  {
+    "key": "button_cancel",
+    "value": "Annulla"
+  },
+  {
+    "key": "message_project_empty",
+    "value": "Seleziona una o più coppie di file:"
+  },
+  {
+    "key": "tooltip_save",
+    "value": "Salva"
+  },
+  {
+    "key": "tooltip_add",
+    "value": "Aggiungi nuovo"
+  },
+  {
+    "key": "tooltip_remove",
+    "value": "Rimuovi"
+  },
+  {
+    "key": "tooltip_move_up",
+    "value": "Sposta in alto"
+  },
+  {
+    "key": "tooltip_move_down",
+    "value": "Sposta in basso"
+  },
+  {
+    "key": "tooltip_merge_previous",
+    "value": "Unisci al segmento precedente"
+  },
+  {
+    "key": "tooltip_merge_next",
+    "value": "Unisci al segmento successivo"
+  },
+  {
+    "key": "tooltip_new_before",
+    "value": "Crea nuovo segmento prima"
+  },
+  {
+    "key": "tooltip_new_after",
+    "value": "Crea nuovo segmento dopo"
+  },
+  {
+    "key": "tooltip_delete",
+    "value": "Elimina segmento"
+  },
+  {
+    "key": "tooltip_edit",
+    "value": "Modifica segmento"
+  },
+  {
+    "key": "tooltip_exit_edit",
+    "value": "Chiudi modalità modifica"
+  },
+  {
+    "key": "tooltip_split",
+    "value": "Dividi segmento"
+  },
+  {
+    "key": "tooltip_project_files",
+    "value": "File di progetto"
+  },
+  {
+    "key": "menu_segment",
+    "value": "Segmento"
+  },
+  {
+    "key": "menu_segment_move_up",
+    "value": "Sposta in alto"
+  },
+  {
+    "key": "menu_segment_move_down",
+    "value": "Sposta in basso"
+  },
+  {
+    "key": "menu_segment_merge_previous",
+    "value": "Unisci al precedente"
+  },
+  {
+    "key": "menu_segment_merge_next",
+    "value": "Unisci al successivo"
+  },
+  {
+    "key": "menu_segment_create_before",
+    "value": "Crea prima"
+  },
+  {
+    "key": "menu_segment_create_after",
+    "value": "Crea dopo"
+  },
+  {
+    "key": "menu_segment_edit",
+    "value": "Modifica"
+  },
+  {
+    "key": "menu_segment_exit_edit",
+    "value": "Termina modifica"
+  },
+  {
+    "key": "menu_segment_split",
+    "value": "Dividi"
+  },
+  {
+    "key": "menu_segment_delete",
+    "value": "Elimina"
+  },
+  {
+    "key": "status_bar_project",
+    "value": "progetto: "
+  },
+  {
+    "key": "status_bar_file_pairs",
+    "value": "coppie di file: "
+  },
+  {
+    "key": "menu_project",
+    "value": "Progetto"
+  },
+  {
+    "key": "menu_project_new",
+    "value": "Nuovo…"
+  },
+  {
+    "key": "menu_project_save",
+    "value": "Salva"
+  },
+  {
+    "key": "menu_project_edit",
+    "value": "Modifica…"
+  },
+  {
+    "key": "menu_project_close",
+    "value": "Chiudi"
+  },
+  {
+    "key": "menu_project_statistics",
+    "value": "Statistiche…"
+  },
+  {
+    "key": "menu_project_export",
+    "value": "Esporta in TMX"
+  },
+  {
+    "key": "language_english",
+    "value": "English"
+  },
+  {
+    "key": "language_italian",
+    "value": "Italiano"
+  },
+  {
+    "key": "language_spanish",
+    "value": "Español"
+  },
+  {
+    "key": "language_french",
+    "value": "Français"
+  },
+  {
+    "key": "language_german",
+    "value": "Deutsch"
+  },
+  {
+    "key": "language_greek",
+    "value": "Ελληνικά"
+  },
+  {
+    "key": "language_romanian",
+    "value": "Română"
+  },
+  {
+    "key": "language_dutch",
+    "value": "Nederlands"
+  },
+  {
+    "key": "language_danish",
+    "value": "Dansk"
+  },
+  {
+    "key": "language_portuguese",
+    "value": "Português"
+  },
+  {
+    "key": "language_finnish",
+    "value": "Suomi"
+  },
+  {
+    "key": "language_swedish",
+    "value": "Svenska"
+  },
+  {
+    "key": "language_czech",
+    "value": "Čeština"
+  },
+  {
+    "key": "language_estonian",
+    "value": "Eesti"
+  },
+  {
+    "key": "language_hungarian",
+    "value": "Magyar"
+  },
+  {
+    "key": "language_latvian",
+    "value": "Latviešu"
+  },
+  {
+    "key": "language_lithuanian",
+    "value": "Lietuvių"
+  },
+  {
+    "key": "language_maltese",
+    "value": "Malti"
+  },
+  {
+    "key": "language_polish",
+    "value": "Polski"
+  },
+  {
+    "key": "language_slovak",
+    "value": "Slovenčina"
+  },
+  {
+    "key": "language_slovenian",
+    "value": "Slovenščina"
+  },
+  {
+    "key": "language_bulgarian",
+    "value": "Вългарски"
+  },
+  {
+    "key": "language_irish",
+    "value": "Gaeilge"
+  },
+  {
+    "key": "language_croatian",
+    "value": "Hrvatski"
+  },
+  {
+    "key": "dialog_title_export",
+    "value": "Seleziona destinazione"
+  },
+  {
+    "key": "dialog_title_create_project",
+    "value": "Crea nuovo progetto"
+  },
+  {
+    "key": "dialog_title_open_file",
+    "value": "Seleziona file"
+  },
+  {
+    "key": "create_project_name",
+    "value": "Nome"
+  },
+  {
+    "key": "create_project_source_language",
+    "value": "Lingua di partenza"
+  },
+  {
+    "key": "create_project_target_language",
+    "value": "Lingua di arrivo"
+  },
+  {
+    "key": "create_project_file_pairs",
+    "value": "Coppie di file"
+  },
+  {
+    "key": "select_placeholder",
+    "value": "Seleziona…"
+  },
+  {
+    "key": "message_error_missing_name",
+    "value": "Seleziona un nome di progetto"
+  },
+  {
+    "key": "message_error_missing_source_language",
+    "value": "Seleziona una lingua di partenza"
+  },
+  {
+    "key": "message_error_missing_target_language",
+    "value": "Seleziona una lingua di arrivo"
+  },
+  {
+    "key": "message_error_missing_files",
+    "value": "Seleziona almeno una coppia di file"
+  },
+  {
+    "key": "message_error_not_matching_file_number",
+    "value": "Seleziona un numero uguale di file di partenza e di arrivo"
+  },
+  {
+    "key": "file_list_placeholder",
+    "value": "Aggiungi un file con il pulsante \"+\""
+  },
+  {
+    "key": "sidebar_title_project_files",
+    "value": "File di progetto"
+  }
+]
