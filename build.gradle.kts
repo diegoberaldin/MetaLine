@@ -57,7 +57,14 @@ compose.desktop {
             version = libs.versions.buildNumber.get()
             includeAllModules = true
             macOS {
+                iconFile.set(project.file("res/icon.icns"))
                 setDockNameSameAsPackageName = true
+            }
+            windows {
+                iconFile.set(project.file("res/icon.ico"))
+            }
+            linux {
+                iconFile.set(project.file("res/icon.png"))
             }
         }
     }
