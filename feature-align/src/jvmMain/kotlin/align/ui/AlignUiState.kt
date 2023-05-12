@@ -4,9 +4,9 @@ import data.SegmentModel
 
 data class AlignUiState(
     val sourceSegments: List<SegmentModel> = emptyList(),
-    val selectedSourceIndex: Int? = null,
+    val selectedSourceId: Int? = null,
     val targetSegments: List<SegmentModel> = emptyList(),
-    val selectedTargetIndex: Int? = null,
+    val selectedTargetId: Int? = null,
 )
 
 data class AlignEditUiState(

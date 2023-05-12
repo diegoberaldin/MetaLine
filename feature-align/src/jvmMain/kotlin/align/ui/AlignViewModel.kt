@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import repository.SegmentRepository
+import kotlin.math.abs
 
 class AlignViewModel(
     private val dispatcherProvider: common.coroutines.CoroutineDispatcherProvider,
@@ -40,12 +41,12 @@ class AlignViewModel(
         targetSegments,
         selectedSourceId,
         selectedTargetId,
-    ) { sourceSegments, targetSegments, selectedSourceIndex, selectedTargetIndex ->
+    ) { sourceSegments, targetSegments, sourceId, targetId ->
         AlignUiState(
             sourceSegments = sourceSegments,
             targetSegments = targetSegments,
-            selectedSourceIndex = selectedSourceIndex,
-            selectedTargetIndex = selectedTargetIndex,
+            selectedSourceId = sourceId,
+            selectedTargetId = targetId,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -167,6 +168,66 @@ class AlignViewModel(
     }
 
     // Merging
+
+    private suspend fun trimEmptySegments() {
+        val originalSourceSegments = sourceSegments.value
+        val originalTargetSegments = targetSegments.value
+        val removedIds = originalSourceSegments.zip(originalTargetSegments).filter {
+            it.first.text.isEmpty() && it.second.text.isEmpty()
+        }.map {
+            segmentRepository.delete(it.first)
+            segmentRepository.delete(it.second)
+            it.first.id to it.second.id
+        }.unzip()
+        sourceSegments.getAndUpdate {
+            it.filter { s -> s.id !in removedIds.first }
+        }
+        targetSegments.getAndUpdate {
+            it.filter { s -> s.id !in removedIds.second }
+        }
+    }
+
+    private suspend fun insertPlaceholders(removeTrailingEmptySegments: Boolean = true) {
+        val sourceSize = sourceSegments.value.size
+        val targetSize = targetSegments.value.size
+        if (sourceSize == targetSize) {
+            if (removeTrailingEmptySegments) {
+                trimEmptySegments()
+                save()
+            }
+            return
+        }
+
+        val insertCount = abs(sourceSize - targetSize)
+        if (sourceSize < targetSize) {
+            // adds to source
+            for (i in 0 until insertCount) {
+                val segment = SegmentModel(lang = sourceLang)
+                val id = segmentRepository.create(model = segment, pairId = pairId)
+                sourceSegments.getAndUpdate {
+                    val newList = it.toMutableList()
+                    newList.add(sourceSize + i, segment.copy(id = id))
+                    newList
+                }
+            }
+        } else {
+            // adds to target
+            for (i in 0 until insertCount) {
+                val segment = SegmentModel(lang = targetLang)
+                val id = segmentRepository.create(model = segment, pairId = pairId)
+                targetSegments.getAndUpdate {
+                    val newList = it.toMutableList()
+                    newList.add(targetSize + i, segment.copy(id = id))
+                    newList
+                }
+            }
+        }
+        if (removeTrailingEmptySegments) {
+            trimEmptySegments()
+        }
+        save()
+    }
+
     fun mergeWithPreviousSegment() {
         if (isEditing.value) {
             toggleEditing()
@@ -195,7 +256,7 @@ class AlignViewModel(
                         segmentRepository.delete(current)
                         newList
                     }
-                    needsSaving.value = true
+                    insertPlaceholders()
                 }
             }
 
@@ -220,7 +281,7 @@ class AlignViewModel(
                         segmentRepository.delete(current)
                         newList
                     }
-                    needsSaving.value = true
+                    insertPlaceholders()
                 }
             }
         }
@@ -253,7 +314,7 @@ class AlignViewModel(
                         segmentRepository.delete(current)
                         newList
                     }
-                    needsSaving.value = true
+                    insertPlaceholders()
                 }
             }
 
@@ -277,13 +338,13 @@ class AlignViewModel(
                         segmentRepository.delete(current)
                         newList
                     }
-                    needsSaving.value = true
+                    insertPlaceholders()
                 }
             }
         }
     }
 
-    // Creation and deletion
+// Creation and deletion
 
     fun createSegmentBefore() {
         if (isEditing.value) {
@@ -303,7 +364,7 @@ class AlignViewModel(
                     }
                     selectedSourceId.value = id
                     toggleEditing()
-                    needsSaving.value = true
+                    insertPlaceholders()
                 }
             }
 
@@ -318,7 +379,7 @@ class AlignViewModel(
                     }
                     selectedTargetId.value = id
                     toggleEditing()
-                    needsSaving.value = true
+                    insertPlaceholders()
                 }
             }
         }
@@ -342,7 +403,7 @@ class AlignViewModel(
                     }
                     selectedSourceId.value = id
                     toggleEditing()
-                    needsSaving.value = true
+                    insertPlaceholders(removeTrailingEmptySegments = false)
                 }
             }
 
@@ -357,7 +418,7 @@ class AlignViewModel(
                     }
                     selectedTargetId.value = id
                     toggleEditing()
-                    needsSaving.value = true
+                    insertPlaceholders(removeTrailingEmptySegments = false)
                 }
             }
         }
@@ -379,7 +440,7 @@ class AlignViewModel(
                         segmentRepository.delete(current)
                         newList
                     }
-                    needsSaving.value = true
+                    insertPlaceholders()
                 }
             }
 
@@ -395,13 +456,13 @@ class AlignViewModel(
                         segmentRepository.delete(current)
                         newList
                     }
-                    needsSaving.value = true
+                    insertPlaceholders()
                 }
             }
         }
     }
 
-    // Editing
+// Editing
 
     fun toggleEditing() {
         val sourceSelectedIdx = sourceSegments.value.indexOfFirst { it.id == selectedSourceId.value }
@@ -504,7 +565,7 @@ class AlignViewModel(
                         newList
                     }
                     toggleEditing()
-                    needsSaving.value = true
+                    insertPlaceholders()
                 }
             }
 
@@ -534,7 +595,7 @@ class AlignViewModel(
                         newList
                     }
                     toggleEditing()
-                    needsSaving.value = true
+                    insertPlaceholders()
                 }
             }
         }

@@ -170,12 +170,20 @@ class MainViewModel(
                     toIndex = segmentCount,
                 )
             }
+            val cleanSegmentLists = sourceSegments.zip(targetSegments)
+                .mapNotNull {
+                    if (it.first.text.isEmpty() || it.second.text.isEmpty()) {
+                        null
+                    } else {
+                        it
+                    }
+                }.unzip()
 
             val input = ExportTmxUseCase.Input(
                 sourceLang = sourceLang,
                 targetLang = targetLang,
-                sourceSegments = sourceSegments,
-                targetSegments = targetSegments,
+                sourceSegments = cleanSegmentLists.first,
+                targetSegments = cleanSegmentLists.second,
             )
             exportTmxUseCase(input = input, destination = File(path))
         }
