@@ -65,7 +65,6 @@ fun main() = application {
 
     Window(onCloseRequest = ::exitApplication, title = "app_name".localized()) {
         val mainUiState by mainViewModel.uiState.collectAsState()
-        val alignUiState by alignViewModel.uiState.collectAsState()
         val alignEditUiState by alignViewModel.editUiState.collectAsState()
         var newDialogOpen by remember {
             mutableStateOf(false)
@@ -110,7 +109,10 @@ fun main() = application {
                     // TODO
                 }
                 Separator()
-                Item(text = "menu_project_export".localized()) {
+                Item(
+                    text = "menu_project_export".localized(),
+                    enabled = mainUiState.project != null,
+                ) {
                     exportDialogOpen = true
                 }
             }
@@ -194,13 +196,7 @@ fun main() = application {
                 nameFilter = { it.endsWith("tmx") },
                 onCloseRequest = {
                     it?.also {
-                        val source = alignUiState.sourceSegments
-                        val target = alignUiState.targetSegments
-                        mainViewModel.exportTmx(
-                            path = it,
-                            sourceSegments = source,
-                            targetSegments = target,
-                        )
+                        mainViewModel.exportTmx(path = it)
                     }
                 },
             )
