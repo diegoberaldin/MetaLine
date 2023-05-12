@@ -14,6 +14,7 @@ val mainModule = module {
             keyStore = get(),
             projectRepository = get(),
             filePairRepository = get(),
+            segmentRepository = get(),
             notificationCenter = get(),
         )
     }

@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 import repository.FilePairRepository
 import repository.ProjectRepository
+import repository.SegmentRepository
 import usecase.ExportTmxUseCase
 import java.io.File
 
@@ -29,6 +30,7 @@ class MainViewModel(
     private val keyStore: TemporaryKeyStore,
     private val projectRepository: ProjectRepository,
     private val filePairRepository: FilePairRepository,
+    private val segmentRepository: SegmentRepository,
     private val exportTmxUseCase: ExportTmxUseCase,
     private val notificationCenter: NotificationCenter,
 ) : InstanceKeeper.Instance {
@@ -145,25 +147,35 @@ class MainViewModel(
         }
     }
 
-    fun exportTmx(path: String, sourceSegments: List<SegmentModel>, targetSegments: List<SegmentModel>) {
+    fun exportTmx(path: String) {
         val project = project.value ?: return
 
-        val segmentCount = minOf(sourceSegments.size, targetSegments.size)
-        val sourceSegmentToInclude = sourceSegments.sortedBy { it.position }.subList(
-            fromIndex = 0,
-            toIndex = segmentCount,
-        )
-        val targetSegmentsToInclude = targetSegments.sortedBy { it.position }.subList(
-            fromIndex = 0,
-            toIndex = segmentCount,
-        )
-
         viewModelScope.launch(dispatcherProvider.io) {
+            val sourceLang = project.sourceLang
+            val targetLang = project.targetLang
+
+            val pairs = filePairRepository.getAll(project.id)
+            val sourceSegments = mutableListOf<SegmentModel>()
+            val targetSegments = mutableListOf<SegmentModel>()
+            for (pair in pairs) {
+                val sourcePairSegments = segmentRepository.getAll(pairId = pair.id, lang = sourceLang)
+                val targetPairSegments = segmentRepository.getAll(pair.id, lang = targetLang)
+                val segmentCount = minOf(sourcePairSegments.size, targetPairSegments.size)
+                sourceSegments += sourcePairSegments.subList(
+                    fromIndex = 0,
+                    toIndex = segmentCount,
+                )
+                targetSegments += targetPairSegments.subList(
+                    fromIndex = 0,
+                    toIndex = segmentCount,
+                )
+            }
+
             val input = ExportTmxUseCase.Input(
-                sourceLang = project.sourceLang,
-                targetLang = project.targetLang,
-                sourceSegments = sourceSegmentToInclude,
-                targetSegments = targetSegmentsToInclude,
+                sourceLang = sourceLang,
+                targetLang = targetLang,
+                sourceSegments = sourceSegments,
+                targetSegments = targetSegments,
             )
             exportTmxUseCase(input = input, destination = File(path))
         }
