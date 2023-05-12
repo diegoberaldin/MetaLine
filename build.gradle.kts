@@ -40,6 +40,7 @@ kotlin {
                 implementation(projects.featureMain)
                 implementation(projects.featureProject)
                 implementation(projects.featureProject.create)
+                implementation(projects.featureProject.statistics)
                 implementation(projects.featureAlign)
             }
         }

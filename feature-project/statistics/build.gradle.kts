@@ -3,7 +3,7 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-group = "feature.project"
+group = "feature.project.statistics"
 version = libs.versions.appVersion.get()
 
 repositories {
@@ -25,15 +25,12 @@ kotlin {
 
                 implementation(libs.koin)
                 implementation(libs.essenty.instancekeeper)
+                implementation(libs.redundent)
 
                 implementation(projects.coreCommon)
-                implementation(projects.coreLocalization)
                 implementation(projects.coreData)
+                implementation(projects.coreLocalization)
                 implementation(projects.coreRepository)
-
-                implementation(projects.featureProject.create)
-                implementation(projects.featureProject.statistics)
-                implementation(projects.featureAlign)
             }
         }
     }
