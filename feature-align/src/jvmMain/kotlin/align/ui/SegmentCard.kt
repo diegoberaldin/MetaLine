@@ -28,12 +28,14 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import common.ui.theme.Spacing
 import data.SegmentModel
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun SegmentCard(
     segment: SegmentModel,
     color: Color,
+    modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     isEditing: Boolean = false,
     onClick: (() -> Unit)? = null,
@@ -44,8 +46,7 @@ internal fun SegmentCard(
         mutableStateOf(TextFieldValue(text = segment.text, selection = TextRange(segment.text.length)))
     }
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .background(color = color, shape = RoundedCornerShape(4.dp)).run {
                 if (!isSelected) {
                     border(
@@ -65,10 +66,14 @@ internal fun SegmentCard(
                 onDoubleClick = { onDoubleClick?.invoke() },
             ).padding(Spacing.s),
     ) {
-        val focusRequester = FocusRequester()
+        val focusRequester = remember {
+            FocusRequester()
+        }
         LaunchedEffect(isSelected && isEditing) {
             if (isEditing) {
-                focusRequester.requestFocus()
+                runCatching {
+                    focusRequester.requestFocus()
+                }
             }
         }
 

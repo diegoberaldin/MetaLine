@@ -195,6 +195,7 @@ fun main() = application {
                 initialFileName = "memory.tmx",
                 nameFilter = { it.endsWith("tmx") },
                 onCloseRequest = {
+                    exportDialogOpen = false
                     it?.also {
                         mainViewModel.exportTmx(path = it)
                     }
