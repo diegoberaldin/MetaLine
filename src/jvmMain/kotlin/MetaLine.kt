@@ -1,7 +1,7 @@
 import align.di.alignModule
 import align.ui.AlignViewModel
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,10 +15,12 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.arkivanov.essenty.instancekeeper.getOrCreate
 import common.di.commonModule
+import common.keystore.TemporaryKeyStore
 import common.log.LogManager
 import common.ui.components.CustomSaveFileDialog
 import common.ui.theme.MetaLineTheme
 import common.utils.AppBusiness.instanceKeeper
+import kotlinx.coroutines.runBlocking
 import main.di.mainModule
 import main.ui.MainScreen
 import main.ui.MainViewModel
@@ -51,7 +53,15 @@ fun initKoin() {
 fun main() = application {
     initKoin()
 
-    L10n.setLanguage(Locale.getDefault().language)
+    val keystore: TemporaryKeyStore by inject(TemporaryKeyStore::class.java)
+    val systemLanguage = Locale.getDefault().language
+    runBlocking {
+        val lang = keystore.get("lang", "")
+        L10n.setLanguage(lang.ifEmpty { systemLanguage })
+        if (lang.isEmpty()) {
+            keystore.save("lang", "lang".localized())
+        }
+    }
 
     val log: LogManager by inject(LogManager::class.java)
     log.debug("Application initialized")
@@ -66,6 +76,9 @@ fun main() = application {
     }
 
     Window(onCloseRequest = ::exitApplication, title = "app_name".localized()) {
+        val lang by L10n.currentLanguage.collectAsState("lang".localized())
+        LaunchedEffect(lang) {}
+
         val mainUiState by mainViewModel.uiState.collectAsState()
         val alignEditUiState by alignViewModel.editUiState.collectAsState()
         var newDialogOpen by remember {
@@ -165,7 +178,10 @@ fun main() = application {
                 ) {
                     alignViewModel.createSegmentBefore()
                 }
-                Item(text = "menu_segment_create_after".localized(), shortcut = KeyShortcut(Key.Enter, meta = true)) {
+                Item(
+                    text = "menu_segment_create_after".localized(),
+                    shortcut = KeyShortcut(Key.Enter, meta = true),
+                ) {
                     alignViewModel.createSegmentAfter()
                 }
                 Separator()
@@ -242,7 +258,6 @@ fun main() = application {
 }
 
 @Composable
-@Preview
 fun App() {
     MetaLineTheme {
         MainScreen()

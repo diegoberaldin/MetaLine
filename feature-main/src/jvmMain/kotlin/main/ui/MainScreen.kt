@@ -1,5 +1,6 @@
 package main.ui
 
+import L10n
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -33,6 +35,7 @@ fun MainScreen() {
         val res: MainViewModel by inject(MainViewModel::class.java)
         res
     }
+
     Column(
         modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colors.background),
@@ -64,6 +67,9 @@ internal fun ProjectContainer(
     val uiState by viewModel.uiState.collectAsState()
     val currentFilePairIndex = uiState.currentFilePairIndex
     val currentProject = uiState.project ?: return
+
+    val lang by L10n.currentLanguage.collectAsState("lang".localized())
+    LaunchedEffect(lang) {}
 
     Column(modifier) {
         Row(modifier = Modifier.weight(1f)) {

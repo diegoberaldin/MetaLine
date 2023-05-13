@@ -1,5 +1,9 @@
 [
   {
+    "key": "lang",
+    "value": "en"
+  },
+  {
     "key": "app_name",
     "value": "MetaLine"
   },
@@ -362,5 +366,13 @@
   {
     "key": "dialog_settings_tab_segmentation",
     "value": "Segmentation rules"
+  },
+  {
+    "key": "dialog_settings_language",
+    "value": "App language:"
+  },
+  {
+    "key": "dialog_settings_version",
+    "value": "App version:"
   }
 ]
