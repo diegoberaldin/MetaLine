@@ -27,4 +27,9 @@ val repositoryModule = module {
             segmentDao = get(),
         )
     }
+    single {
+        SegmentationRuleRepository(
+            segmentationRuleDao = get(),
+        )
+    }
 }

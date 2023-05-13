@@ -24,4 +24,8 @@ val persistenceModule = module {
         val db: AppDatabase = get()
         db.segmentDao()
     }
+    single {
+        val db: AppDatabase = get()
+        db.segmentationRuleDao()
+    }
 }

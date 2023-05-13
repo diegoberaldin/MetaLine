@@ -1,8 +1,7 @@
-package align.ui
+package projectsettings.ui.segmentation
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,7 +11,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,63 +25,41 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import common.ui.theme.Spacing
-import data.SegmentModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun SegmentCard(
-    segment: SegmentModel,
+internal fun SegmentationRuleField(
+    pattern: String,
     color: Color,
     modifier: Modifier = Modifier,
-    isSelected: Boolean = false,
     isEditing: Boolean = false,
-    onClick: (() -> Unit)? = null,
-    onDoubleClick: (() -> Unit)? = null,
-    onTextEdited: ((text: String, position: Int) -> Unit)? = null,
+    onTextEdited: ((text: String) -> Unit)? = null,
 ) {
-    var value by remember(segment.id, isEditing) {
-        mutableStateOf(TextFieldValue(text = segment.text, selection = TextRange(segment.text.length)))
+    var value by remember {
+        mutableStateOf(TextFieldValue(text = pattern, selection = TextRange(pattern.length)))
+    }
+    val focusRequester = remember {
+        FocusRequester()
     }
     Box(
         modifier = modifier
-            .background(color = color, shape = RoundedCornerShape(4.dp)).run {
-                if (!isSelected) {
-                    border(
-                        width = 1.dp,
-                        color = color,
-                        shape = RoundedCornerShape(4.dp),
-                    )
-                } else {
-                    border(
-                        width = 1.dp,
-                        color = Color.White,
-                        shape = RoundedCornerShape(4.dp),
-                    )
+            .background(color = color, shape = RoundedCornerShape(4.dp))
+            .onClick {
+                if (isEditing) {
+                    runCatching {
+                        focusRequester.requestFocus()
+                    }
                 }
-            }.onClick(
-                onClick = { onClick?.invoke() },
-                onDoubleClick = { onDoubleClick?.invoke() },
-            ).padding(Spacing.s),
+            }.padding(Spacing.s),
     ) {
-        val focusRequester = remember {
-            FocusRequester()
-        }
-        LaunchedEffect(isSelected && isEditing) {
-            if (isEditing) {
-                runCatching {
-                    focusRequester.requestFocus()
-                }
-            }
-        }
-
         Box(modifier = Modifier.fillMaxWidth()) {
             Text(
-                modifier = Modifier.alpha(if (isSelected && isEditing) 0f else 1f),
-                text = segment.text,
+                modifier = Modifier.alpha(if (isEditing) 0f else 1f),
+                text = pattern,
                 style = MaterialTheme.typography.caption,
                 color = Color.White,
             )
-            if (isSelected && isEditing) {
+            if (isEditing) {
                 BasicTextField(
                     modifier = Modifier.matchParentSize().focusRequester(focusRequester),
                     textStyle = MaterialTheme.typography.caption.copy(color = Color.White),
@@ -91,7 +67,7 @@ internal fun SegmentCard(
                     value = value,
                     onValueChange = {
                         value = it
-                        onTextEdited?.invoke(it.text, it.selection.end)
+                        onTextEdited?.invoke(it.text)
                     },
                 )
             }

@@ -3,14 +3,14 @@ package repository
 import data.ProjectModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.isActive
 import persistence.dao.ProjectDAO
 
 class ProjectRepository(
     private val projectDao: ProjectDAO,
 ) {
-    val observeAll: Flow<List<ProjectModel>> = callbackFlow {
+    val observeAll: Flow<List<ProjectModel>> = channelFlow {
         while (true) {
             if (!isActive) {
                 break

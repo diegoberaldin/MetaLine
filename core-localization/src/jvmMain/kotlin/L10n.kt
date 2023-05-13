@@ -1,16 +1,12 @@
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.isActive
 
 object L10n {
 
     private val default = DefaultLocalization()
 
-    val currentLanguage = callbackFlow<String> {
+    val currentLanguage = channelFlow<String> {
         while (true) {
             if (!isActive) {
                 break
