@@ -37,7 +37,7 @@
   },
   {
     "key": "tooltip_add",
-    "value": "Aggiungi nuovo"
+    "value": "Aggiungi"
   },
   {
     "key": "tooltip_remove",
@@ -69,11 +69,11 @@
   },
   {
     "key": "tooltip_delete",
-    "value": "Elimina segmento"
+    "value": "Elimina"
   },
   {
     "key": "tooltip_edit",
-    "value": "Modifica segmento"
+    "value": "Modifica"
   },
   {
     "key": "tooltip_exit_edit",
@@ -374,5 +374,21 @@
   {
     "key": "dialog_settings_version",
     "value": "Versione app:"
+  },
+  {
+    "key": "segmentation_rules_default_intro",
+    "value": "Regole di segmentazione di default per i nuovi progetti (per ogni lingua)"
+  },
+  {
+    "key": "segmentation_rule_pattern_before",
+    "value": "Pattern prima"
+  },
+  {
+    "key": "segmentation_rule_pattern_after",
+    "value": "Pattern dopo"
+  },
+  {
+    "key": "segmentation_rule_break_exception",
+    "value": "Interr./Ecc."
   }
 ]

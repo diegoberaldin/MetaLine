@@ -7,9 +7,11 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import persistence.dao.FilePairDAO
 import persistence.dao.ProjectDAO
 import persistence.dao.SegmentDAO
+import persistence.dao.SegmentationRuleDAO
 import persistence.entities.FilePairEntity
 import persistence.entities.ProjectEntity
 import persistence.entities.SegmentEntity
+import persistence.entities.SegmentationRuleEntity
 
 class AppDatabase(
     private val filename: String = FILE_NAME,
@@ -35,6 +37,7 @@ class AppDatabase(
                 ProjectEntity,
                 FilePairEntity,
                 SegmentEntity,
+                SegmentationRuleEntity,
             )
         }
     }
@@ -44,4 +47,6 @@ class AppDatabase(
     fun filePairDao() = FilePairDAO()
 
     fun segmentDao() = SegmentDAO()
+
+    fun segmentationRuleDao() = SegmentationRuleDAO()
 }

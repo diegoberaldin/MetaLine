@@ -1,7 +1,6 @@
 package projectsettings.ui.dialog
 
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
-import data.ProjectModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -31,20 +30,16 @@ class SettingsViewModel : InstanceKeeper.Instance {
         initialValue = SettingsUiState(),
     )
 
-    override fun onDestroy() {
-        viewModelScope.cancel()
+    init {
+        tabs.value = listOf(
+            SettingsTab.GENERAL,
+            SettingsTab.SEGMENTATION_RULES,
+        )
+        currentTab.value = SettingsTab.GENERAL
     }
 
-    fun load(project: ProjectModel?) {
-        if (project == null) {
-            tabs.value = listOf(SettingsTab.GENERAL)
-        } else {
-            tabs.value = listOf(
-                SettingsTab.GENERAL,
-                SettingsTab.SEGMENTATION_RULES,
-            )
-        }
-        currentTab.value = SettingsTab.GENERAL
+    override fun onDestroy() {
+        viewModelScope.cancel()
     }
 
     fun selectTab(value: SettingsTab) {

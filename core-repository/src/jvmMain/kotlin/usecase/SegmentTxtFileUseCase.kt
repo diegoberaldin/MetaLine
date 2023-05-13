@@ -1,7 +1,7 @@
 package usecase
 
 import data.SegmentModel
-import data.SegmentationRule
+import data.SegmentationRuleModel
 import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -9,8 +9,8 @@ import kotlin.coroutines.suspendCoroutine
 class SegmentTxtFileUseCase {
 
     data class Input(
-        val rules: List<SegmentationRule> = listOf(
-            SegmentationRule(before = "\\.", after = "\\s"),
+        val rules: List<SegmentationRuleModel> = listOf(
+            SegmentationRuleModel(before = "\\.", after = "\\s"),
         ),
     )
 

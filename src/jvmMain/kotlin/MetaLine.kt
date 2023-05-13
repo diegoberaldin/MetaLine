@@ -234,7 +234,6 @@ fun main() = application {
 
         if (settingsDialogOpen) {
             SettingsDialog(
-                project = mainUiState.project,
                 onClose = {
                     settingsDialogOpen = false
                 },

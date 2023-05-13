@@ -1,5 +1,6 @@
 package projectsettings.ui.dialog
 
+import L10n
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,7 +30,6 @@ import common.ui.theme.MetaLineTheme
 import common.ui.theme.SelectedBackground
 import common.ui.theme.Spacing
 import common.utils.AppBusiness
-import data.ProjectModel
 import localized
 import org.koin.java.KoinJavaComponent.inject
 import projectsettings.ui.general.SettingsGeneralScreen
@@ -37,16 +37,14 @@ import projectsettings.ui.segmentation.SettingsSegmentationScreen
 
 @Composable
 fun SettingsDialog(
-    project: ProjectModel?,
     onClose: (() -> Unit)? = null,
 ) {
     val viewModel: SettingsViewModel = AppBusiness.instanceKeeper.getOrCreate {
         val res: SettingsViewModel by inject(SettingsViewModel::class.java)
         res
     }
-    LaunchedEffect(project) {
-        viewModel.load(project)
-    }
+    val lang by L10n.currentLanguage.collectAsState("lang".localized())
+    LaunchedEffect(lang) {}
 
     MetaLineTheme {
         Window(
