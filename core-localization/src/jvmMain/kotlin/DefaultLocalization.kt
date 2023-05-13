@@ -17,10 +17,9 @@ class DefaultLocalization : Localization {
         } ?: defaultValues
     }
 
+    override fun getLanguage(): String = "lang".localized()
+
     override fun get(key: String) = localizables.firstOrNull { it.key == key }?.value
         ?: defaultValues.firstOrNull { it.key == key }?.value
         ?: key
 }
-
-
-

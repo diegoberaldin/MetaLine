@@ -29,5 +29,6 @@ include(
     ":feature-project",
     ":feature-project:create",
     ":feature-project:statistics",
+    ":feature-project:settings",
     ":feature-align",
 )

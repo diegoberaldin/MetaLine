@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Token
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -39,6 +40,9 @@ import org.koin.java.KoinJavaComponent
 fun IntroScreen(
     modifier: Modifier = Modifier,
 ) {
+    val lang by L10n.currentLanguage.collectAsState("lang".localized())
+    LaunchedEffect(lang) {}
+
     val viewModel = AppBusiness.instanceKeeper.getOrCreate {
         val res: IntroViewModel by KoinJavaComponent.inject(IntroViewModel::class.java)
         res

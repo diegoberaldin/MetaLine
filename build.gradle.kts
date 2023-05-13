@@ -41,6 +41,7 @@ kotlin {
                 implementation(projects.featureProject)
                 implementation(projects.featureProject.create)
                 implementation(projects.featureProject.statistics)
+                implementation(projects.featureProject.settings)
                 implementation(projects.featureAlign)
             }
         }

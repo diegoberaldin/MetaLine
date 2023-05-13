@@ -1,5 +1,9 @@
 [
   {
+    "key": "lang",
+    "value": "it"
+  },
+  {
     "key": "app_name",
     "value": "MetaLine"
   },
@@ -346,5 +350,29 @@
   {
     "key": "dialog_statistics_item_completion",
     "value": "Completamento"
+  },
+  {
+    "key": "menu_project_settings",
+    "value": "Impostazioni…"
+  },
+  {
+    "key": "dialog_title_settings",
+    "value": "Impostazioni"
+  },
+  {
+    "key": "dialog_settings_tab_general",
+    "value": "Generali"
+  },
+  {
+    "key": "dialog_settings_tab_segmentation",
+    "value": "Regole di segmentazione"
+  },
+  {
+    "key": "dialog_settings_language",
+    "value": "Lingua app:"
+  },
+  {
+    "key": "dialog_settings_version",
+    "value": "Versione app:"
   }
 ]
