@@ -1,4 +1,4 @@
-package projectmedatada.ui.components
+package projectmetadata.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background

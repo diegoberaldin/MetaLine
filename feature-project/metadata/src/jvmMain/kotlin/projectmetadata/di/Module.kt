@@ -1,7 +1,7 @@
-package projectmedatada.di
+package projectmetadata.di
 
 import org.koin.dsl.module
-import projectmedatada.ui.ProjectMetadataViewModel
+import projectmetadata.ui.ProjectMetadataViewModel
 
 val projectMetadataModule = module {
     factory {

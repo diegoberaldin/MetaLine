@@ -32,8 +32,9 @@ import kotlinx.coroutines.launch
 import localized
 import org.koin.java.KoinJavaComponent
 import org.koin.java.KoinJavaComponent.inject
-import projectmedatada.ui.ProjectMetadataScreen
-import projectmedatada.ui.ProjectMetadataViewModel
+import projectmetadata.ui.ProjectMetadataScreen
+import projectmetadata.ui.ProjectMetadataViewModel
+import projectsegmentation.ui.ProjectSegmentationScreen
 
 @Composable
 fun CreateProjectDialog(
@@ -50,6 +51,7 @@ fun CreateProjectDialog(
     LaunchedEffect(viewModel) {
         launch {
             metadataViewModel.onDone.collect {
+                viewModel.setProject(it)
                 viewModel.next()
             }
         }
@@ -76,6 +78,13 @@ fun CreateProjectDialog(
                             modifier = contentModifier,
                         )
                     }
+
+                    1 -> {
+                        ProjectSegmentationScreen(
+                            modifier = contentModifier,
+                            project = uiState.project,
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(Spacing.s))
                 Row(
@@ -99,6 +108,10 @@ fun CreateProjectDialog(
                             when (uiState.step) {
                                 0 -> {
                                     metadataViewModel.submit()
+                                }
+
+                                1 -> {
+                                    onClose?.invoke(uiState.project)
                                 }
                             }
                         },

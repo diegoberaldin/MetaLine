@@ -34,8 +34,9 @@ import data.ProjectModel
 import kotlinx.coroutines.launch
 import localized
 import org.koin.java.KoinJavaComponent.inject
-import projectmedatada.ui.ProjectMetadataScreen
-import projectmedatada.ui.ProjectMetadataViewModel
+import projectmetadata.ui.ProjectMetadataScreen
+import projectmetadata.ui.ProjectMetadataViewModel
+import projectsegmentation.ui.ProjectSegmentationScreen
 
 @Composable
 fun EditProjectDialog(
@@ -97,7 +98,11 @@ fun EditProjectDialog(
                         },
                     ).padding(horizontal = Spacing.s)
                 when (uiState.currentTab) {
-                    EditProjectSection.SEGMENTATION_RULES -> ProjectMetadataScreen(modifier = bottomModifier) // TODO
+                    EditProjectSection.SEGMENTATION_RULES -> ProjectSegmentationScreen(
+                        modifier = bottomModifier,
+                        project = project,
+                    )
+
                     else -> ProjectMetadataScreen(modifier = bottomModifier)
                 }
                 Row(

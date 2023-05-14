@@ -42,6 +42,7 @@ kotlin {
                 implementation(projects.featureProject.create)
                 implementation(projects.featureProject.edit)
                 implementation(projects.featureProject.metadata)
+                implementation(projects.featureProject.segmentation)
                 implementation(projects.featureProject.statistics)
                 implementation(projects.featureProject.settings)
                 implementation(projects.featureAlign)

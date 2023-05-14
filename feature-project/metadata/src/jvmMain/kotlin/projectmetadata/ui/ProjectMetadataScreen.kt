@@ -1,4 +1,4 @@
-package projectmedatada.ui
+package projectmetadata.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,8 +23,8 @@ import common.ui.theme.Spacing
 import common.utils.AppBusiness
 import localized
 import org.koin.java.KoinJavaComponent
-import projectmedatada.ui.components.FilePairSelector
-import projectmedatada.ui.components.LanguagesSelector
+import projectmetadata.ui.components.FilePairSelector
+import projectmetadata.ui.components.LanguagesSelector
 
 @Composable
 fun ProjectMetadataScreen(

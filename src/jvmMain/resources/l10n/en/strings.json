@@ -398,5 +398,9 @@
   {
     "key": "dialog_project_metadata",
     "value": "Metadata"
+  },
+  {
+    "key": "segmentation_rules_project_intro",
+    "value": "Override default with project-specific rules"
   }
 ]

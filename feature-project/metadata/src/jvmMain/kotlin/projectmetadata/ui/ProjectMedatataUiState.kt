@@ -1,4 +1,4 @@
-package projectmedatada.ui
+package projectmetadata.ui
 
 import data.LanguageModel
 

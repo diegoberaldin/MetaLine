@@ -398,5 +398,9 @@
   {
     "key": "dialog_project_metadata",
     "value": "Metadati"
+  },
+  {
+    "key": "segmentation_rules_project_intro",
+    "value": "Sovrascrivi le opzioni di default con regole specifiche di progetto"
   }
 ]

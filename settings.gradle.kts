@@ -30,6 +30,7 @@ include(
     ":feature-project:create",
     ":feature-project:edit",
     ":feature-project:metadata",
+    ":feature-project:segmentation",
     ":feature-project:statistics",
     ":feature-project:settings",
     ":feature-align",

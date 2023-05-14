@@ -1,4 +1,4 @@
-package projectmedatada.ui
+package projectmetadata.ui
 
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import common.coroutines.CoroutineDispatcherProvider

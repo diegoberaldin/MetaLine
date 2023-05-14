@@ -33,6 +33,7 @@ kotlin {
                 implementation(projects.coreRepository)
 
                 implementation(projects.featureProject.metadata)
+                implementation(projects.featureProject.segmentation)
             }
         }
     }
