@@ -19,6 +19,7 @@ import common.keystore.TemporaryKeyStore
 import common.log.LogManager
 import common.ui.components.CustomSaveFileDialog
 import common.ui.theme.MetaLineTheme
+import common.utils.AppBusiness
 import common.utils.AppBusiness.instanceKeeper
 import kotlinx.coroutines.runBlocking
 import main.di.mainModule
@@ -29,6 +30,7 @@ import org.koin.java.KoinJavaComponent.inject
 import persistence.di.persistenceModule
 import project.di.projectModule
 import projectcreate.ui.dialog.CreateProjectDialog
+import projectcreate.ui.dialog.CreateProjectViewModel
 import projectsettings.ui.dialog.SettingsDialog
 import projectstatistics.ui.dialog.StatisticsDialog
 import repository.repositoryModule
@@ -103,6 +105,11 @@ fun main() = application {
                     text = "menu_project_new".localized(),
                     shortcut = KeyShortcut(Key.N, meta = true),
                 ) {
+                    val vm = AppBusiness.instanceKeeper.getOrCreate {
+                        val res: CreateProjectViewModel by inject(CreateProjectViewModel::class.java)
+                        res
+                    }
+                    vm.load(project = null)
                     newDialogOpen = true
                 }
                 Item(
