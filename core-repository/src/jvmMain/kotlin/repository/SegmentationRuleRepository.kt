@@ -5,8 +5,14 @@ import persistence.dao.SegmentationRuleDAO
 
 class SegmentationRuleRepository(
     private val segmentationRuleDao: SegmentationRuleDAO,
+    private val languageRepository: LanguageRepository,
 ) {
-    suspend fun create(model: SegmentationRuleModel, projectId: Int?) =
+
+    fun getInitialDefaultRules(): List<SegmentationRuleModel> = languageRepository.getDefaultLanguages().map {
+        SegmentationRuleModel(lang = it.code, before = "\\.", after = "\\s")
+    }
+
+    suspend fun create(model: SegmentationRuleModel, projectId: Int? = null) =
         segmentationRuleDao.create(model = model, projectId = projectId)
 
     suspend fun update(model: SegmentationRuleModel) = segmentationRuleDao.update(model)

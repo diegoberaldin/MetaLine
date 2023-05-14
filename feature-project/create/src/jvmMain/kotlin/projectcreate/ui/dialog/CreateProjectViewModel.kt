@@ -377,8 +377,16 @@ class CreateProjectViewModel(
                 )
                 if (existing == null) {
                     val pairId = filePairRepository.create(model = pair, projectId = projectId)
-                    val sourceSegments = segmentUseCase(path = pair.sourcePath).map { it.copy(lang = sourceLang) }
-                    val targetSegments = segmentUseCase(path = pair.targetPath).map { it.copy(lang = targetLang) }
+                    val sourceSegments = segmentUseCase(
+                        path = pair.sourcePath,
+                        lang = sourceLang,
+                        projectId = projectId,
+                    ).map { it.copy(lang = sourceLang) }
+                    val targetSegments = segmentUseCase(
+                        path = pair.targetPath,
+                        lang = targetLang,
+                        projectId = projectId,
+                    ).map { it.copy(lang = targetLang) }
                     segmentRepository.createAll(models = sourceSegments, pairId = pairId)
                     segmentRepository.createAll(models = targetSegments, pairId = pairId)
                 }
