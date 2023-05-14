@@ -1,4 +1,4 @@
-package projectcreate.ui.components
+package projectmedatada.ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

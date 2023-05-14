@@ -20,7 +20,6 @@ import common.log.LogManager
 import common.ui.components.CustomSaveFileDialog
 import common.ui.theme.MetaLineTheme
 import common.utils.AppBusiness
-import common.utils.AppBusiness.instanceKeeper
 import kotlinx.coroutines.runBlocking
 import main.di.mainModule
 import main.ui.MainScreen
@@ -30,7 +29,7 @@ import org.koin.java.KoinJavaComponent.inject
 import persistence.di.persistenceModule
 import project.di.projectModule
 import projectcreate.ui.dialog.CreateProjectDialog
-import projectcreate.ui.dialog.CreateProjectViewModel
+import projectmedatada.ui.ProjectMetadataViewModel
 import projectsettings.ui.dialog.SettingsDialog
 import projectstatistics.ui.dialog.StatisticsDialog
 import repository.repositoryModule
@@ -81,11 +80,11 @@ fun main() = application {
         val lang by L10n.currentLanguage.collectAsState("lang".localized())
         LaunchedEffect(lang) {}
 
-        val mainViewModel: MainViewModel = instanceKeeper.getOrCreate {
+        val mainViewModel: MainViewModel = AppBusiness.instanceKeeper.getOrCreate {
             val res: MainViewModel by inject(MainViewModel::class.java)
             res
         }
-        val alignViewModel: AlignViewModel = instanceKeeper.getOrCreate {
+        val alignViewModel: AlignViewModel = AppBusiness.instanceKeeper.getOrCreate {
             val res: AlignViewModel by inject(AlignViewModel::class.java)
             res
         }
@@ -115,7 +114,7 @@ fun main() = application {
                     shortcut = KeyShortcut(Key.N, meta = true),
                 ) {
                     val vm = AppBusiness.instanceKeeper.getOrCreate {
-                        val res: CreateProjectViewModel by inject(CreateProjectViewModel::class.java)
+                        val res: ProjectMetadataViewModel by inject(ProjectMetadataViewModel::class.java)
                         res
                     }
                     vm.load(project = null)

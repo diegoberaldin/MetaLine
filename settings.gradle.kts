@@ -28,6 +28,7 @@ include(
     ":feature-main:intro",
     ":feature-project",
     ":feature-project:create",
+    ":feature-project:metadata",
     ":feature-project:statistics",
     ":feature-project:settings",
     ":feature-align",

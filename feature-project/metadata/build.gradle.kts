@@ -3,7 +3,7 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-group = "feature.project.create"
+group = "feature.project.metadata"
 version = libs.versions.appVersion.get()
 
 repositories {
@@ -31,8 +31,6 @@ kotlin {
                 implementation(projects.coreData)
                 implementation(projects.coreLocalization)
                 implementation(projects.coreRepository)
-
-                implementation(projects.featureProject.metadata)
             }
         }
     }
