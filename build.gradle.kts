@@ -40,6 +40,7 @@ kotlin {
                 implementation(projects.featureMain)
                 implementation(projects.featureProject)
                 implementation(projects.featureProject.create)
+                implementation(projects.featureProject.edit)
                 implementation(projects.featureProject.metadata)
                 implementation(projects.featureProject.statistics)
                 implementation(projects.featureProject.settings)

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,7 +21,6 @@ import common.ui.components.CustomOpenFileDialog
 import common.ui.components.CustomTextField
 import common.ui.theme.Spacing
 import common.utils.AppBusiness
-import data.ProjectModel
 import localized
 import org.koin.java.KoinJavaComponent
 import projectmedatada.ui.components.FilePairSelector
@@ -31,15 +29,10 @@ import projectmedatada.ui.components.LanguagesSelector
 @Composable
 fun ProjectMetadataScreen(
     modifier: Modifier = Modifier,
-    project: ProjectModel? = null,
 ) {
     val viewModel: ProjectMetadataViewModel = AppBusiness.instanceKeeper.getOrCreate {
         val res: ProjectMetadataViewModel by KoinJavaComponent.inject(ProjectMetadataViewModel::class.java)
         res
-    }
-
-    LaunchedEffect(key1 = project) {
-        viewModel.load(project)
     }
 
     val uiState by viewModel.uiState.collectAsState()

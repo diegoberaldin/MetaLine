@@ -390,5 +390,13 @@
   {
     "key": "segmentation_rule_break_exception",
     "value": "Break/Exc."
+  },
+  {
+    "key": "dialog_title_edit_project",
+    "value": "Edit project"
+  },
+  {
+    "key": "dialog_project_metadata",
+    "value": "Metadata"
   }
 ]

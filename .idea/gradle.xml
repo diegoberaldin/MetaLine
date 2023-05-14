@@ -18,16 +18,17 @@
             <option value="$PROJECT_DIR$/feature-main/intro" />
             <option value="$PROJECT_DIR$/feature-project" />
             <option value="$PROJECT_DIR$/feature-project/create" />
+            <option value="$PROJECT_DIR$/feature-project/metadata" />
             <option value="$PROJECT_DIR$/feature-project/settings" />
             <option value="$PROJECT_DIR$/feature-project/statistics" />
           </set>
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/feature-project/metadata" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/feature-project/edit" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$/feature-project/metadata" />
+            <option value="$PROJECT_DIR$/feature-project/edit" />
           </set>
         </option>
       </GradleProjectSettings>

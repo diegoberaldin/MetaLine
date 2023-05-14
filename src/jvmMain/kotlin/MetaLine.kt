@@ -29,6 +29,7 @@ import org.koin.java.KoinJavaComponent.inject
 import persistence.di.persistenceModule
 import project.di.projectModule
 import projectcreate.ui.dialog.CreateProjectDialog
+import projectedit.ui.dialog.EditProjectDialog
 import projectmedatada.ui.ProjectMetadataViewModel
 import projectsettings.ui.dialog.SettingsDialog
 import projectstatistics.ui.dialog.StatisticsDialog
@@ -228,7 +229,7 @@ fun main() = application {
         }
 
         if (editDialogOpen) {
-            CreateProjectDialog(
+            EditProjectDialog(
                 project = mainUiState.project,
                 onClose = {
                     editDialogOpen = false
