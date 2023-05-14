@@ -21,7 +21,7 @@ class SegmentationRuleRepository(
 
     suspend fun getAll(projectId: Int, lang: String) = segmentationRuleDao.getAll(projectId = projectId, lang = lang)
 
-    suspend fun getAllDefault() = segmentationRuleDao.getAllDefault()
+    suspend fun getAllDefault(lang: String) = segmentationRuleDao.getAllDefault(lang)
 
     suspend fun getById(id: Int) = segmentationRuleDao.getById(id)
 }

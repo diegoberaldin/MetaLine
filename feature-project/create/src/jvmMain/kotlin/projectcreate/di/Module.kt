@@ -8,8 +8,7 @@ val projectCreateModule = module {
         CreateProjectViewModel(
             dispatcherProvider = get(),
             languageRepository = get(),
-            languageNameRepository = get(),
-            flagsRepository = get(),
+            completeLanguage = get(),
             segmentUseCase = get(),
             projectRepository = get(),
             filePairRepository = get(),

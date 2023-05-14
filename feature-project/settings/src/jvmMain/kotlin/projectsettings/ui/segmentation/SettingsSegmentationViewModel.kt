@@ -2,6 +2,7 @@ package projectsettings.ui.segmentation
 
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import common.coroutines.CoroutineDispatcherProvider
+import data.LanguageModel
 import data.SegmentationRuleModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -12,19 +13,32 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import repository.LanguageRepository
 import repository.SegmentationRuleRepository
+import usecase.GetCompleteLanguageUseCase
 
 class SettingsSegmentationViewModel(
     private val dispatcherProvider: CoroutineDispatcherProvider,
     private val segmentationRuleRepository: SegmentationRuleRepository,
+    private val languageRepository: LanguageRepository,
+    private val completeLanguage: GetCompleteLanguageUseCase,
 ) : InstanceKeeper.Instance {
 
     private val rules = MutableStateFlow<List<SegmentationRuleModel>>(emptyList())
+    private val availableLanguages = MutableStateFlow<List<LanguageModel>>(emptyList())
+    private val currentLanguage = MutableStateFlow<LanguageModel?>(null)
     private val currentEditedRule = MutableStateFlow<Int?>(null)
     private val viewModelScope = CoroutineScope(SupervisorJob())
 
-    val uiState = combine(rules, currentEditedRule) { rules, currentEditedRule ->
+    val uiState = combine(
+        currentLanguage,
+        availableLanguages,
+        rules,
+        currentEditedRule,
+    ) { currentLanguage, availableLanguages, rules, currentEditedRule ->
         SettingsSegmentationUiState(
+            currentLanguage = currentLanguage,
+            availableLanguages = availableLanguages,
             rules = rules,
             currentEditedRule = currentEditedRule,
         )
@@ -35,8 +49,10 @@ class SettingsSegmentationViewModel(
     )
 
     init {
-        viewModelScope.launch(dispatcherProvider.io) {
-            rules.value = segmentationRuleRepository.getAllDefault()
+        availableLanguages.value = languageRepository.getDefaultLanguages().map { completeLanguage(it) }
+        val currentLang = availableLanguages.value.firstOrNull()
+        if (currentLang != null) {
+            setCurrentLanguage(currentLang)
         }
     }
 
@@ -44,10 +60,21 @@ class SettingsSegmentationViewModel(
         viewModelScope.cancel()
     }
 
+    fun setCurrentLanguage(lang: LanguageModel) {
+        currentLanguage.value = lang
+        viewModelScope.launch(dispatcherProvider.io) {
+            rules.value = segmentationRuleRepository.getAllDefault(lang = lang.code)
+        }
+    }
+
     fun deleteRule(index: Int) {
         val rule = rules.value[index]
         viewModelScope.launch(dispatcherProvider.io) {
             segmentationRuleRepository.delete(rule)
+            val lang = currentLanguage.value?.code
+            if (lang != null) {
+                rules.value = segmentationRuleRepository.getAllDefault(lang = lang)
+            }
         }
     }
 

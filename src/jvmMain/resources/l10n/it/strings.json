@@ -377,7 +377,7 @@
   },
   {
     "key": "segmentation_rules_default_intro",
-    "value": "Regole di segmentazione di default per i nuovi progetti (per ogni lingua)"
+    "value": "Regole di segmentazione di default e indipendenti dal progetto (salvo diversamente specificato)"
   },
   {
     "key": "segmentation_rule_pattern_before",

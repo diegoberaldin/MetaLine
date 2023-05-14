@@ -21,22 +21,20 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import localized
 import repository.FilePairRepository
-import repository.FlagsRepository
-import repository.LanguageNameRepository
 import repository.LanguageRepository
 import repository.ProjectRepository
 import repository.SegmentRepository
+import usecase.GetCompleteLanguageUseCase
 import usecase.SegmentTxtFileUseCase
 
 class CreateProjectViewModel(
     private val dispatcherProvider: CoroutineDispatcherProvider,
     private val languageRepository: LanguageRepository,
-    private val languageNameRepository: LanguageNameRepository,
-    private val flagsRepository: FlagsRepository,
     private val segmentUseCase: SegmentTxtFileUseCase,
     private val projectRepository: ProjectRepository,
     private val filePairRepository: FilePairRepository,
     private val segmentRepository: SegmentRepository,
+    private val completeLanguage: GetCompleteLanguageUseCase,
     private val notificationCenter: NotificationCenter,
 ) : InstanceKeeper.Instance {
 
@@ -58,13 +56,7 @@ class CreateProjectViewModel(
     private var projectId = 0
 
     private val defaultLanguages: List<LanguageModel> = languageRepository.getDefaultLanguages().map {
-        val code = it.code
-        val name = buildString {
-            append(flagsRepository.getFlag(code))
-            append(" ")
-            append(languageNameRepository.getName(code))
-        }
-        it.copy(name = name)
+        completeLanguage(it)
     }
 
     val uiState = name.map { name ->

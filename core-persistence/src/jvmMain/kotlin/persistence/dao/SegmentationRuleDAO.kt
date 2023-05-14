@@ -40,8 +40,8 @@ class SegmentationRuleDAO {
             .map { it.toModel() }
     }
 
-    suspend fun getAllDefault(): List<SegmentationRuleModel> = newSuspendedTransaction {
-        SegmentationRuleEntity.select { SegmentationRuleEntity.projectId.isNull() }
+    suspend fun getAllDefault(lang: String): List<SegmentationRuleModel> = newSuspendedTransaction {
+        SegmentationRuleEntity.select { SegmentationRuleEntity.projectId.isNull() and (SegmentationRuleEntity.lang eq lang) }
             .map { it.toModel() }
     }
 

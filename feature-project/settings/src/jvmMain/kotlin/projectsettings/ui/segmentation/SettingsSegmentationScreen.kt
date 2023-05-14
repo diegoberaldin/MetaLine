@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.arkivanov.essenty.instancekeeper.getOrCreate
+import common.ui.components.CustomSpinner
 import common.ui.components.CustomTooltipArea
 import common.ui.theme.Indigo800
 import common.ui.theme.Purple800
@@ -59,6 +60,17 @@ fun SettingsSegmentationScreen(
             text = "segmentation_rules_default_intro".localized(),
             style = MaterialTheme.typography.caption,
             color = Color.White,
+        )
+        Spacer(modifier = Modifier.height(Spacing.xs))
+        val availableLanguages = uiState.availableLanguages
+        CustomSpinner(
+            modifier = Modifier.fillMaxWidth().height(20.dp),
+            values = availableLanguages.map { it.name },
+            current = uiState.currentLanguage?.name,
+            onValueChanged = {
+                val lang = availableLanguages[it]
+                viewModel.setCurrentLanguage(lang)
+            },
         )
         Spacer(modifier = Modifier.height(Spacing.xs))
         Row(
