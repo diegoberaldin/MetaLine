@@ -23,6 +23,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.ArrowCircleDown
+import androidx.compose.material.icons.filled.ArrowCircleUp
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EditOff
@@ -101,11 +103,30 @@ fun ProjectSegmentationScreen(
             },
         )
         Spacer(modifier = Modifier.height(Spacing.xs))
+        Row {
+            Spacer(modifier = Modifier.weight(1f))
+            val iconModifier = Modifier.size(22.dp).padding(1.dp)
+            val buttonEnabled = !uiState.applyDefaultRules
+            CustomTooltipArea(
+                text = "tooltip_add".localized(),
+            ) {
+                Icon(
+                    modifier = iconModifier.onClick {
+                        if (buttonEnabled) {
+                            viewModel.createRule()
+                        }
+                    },
+                    imageVector = Icons.Default.AddCircle,
+                    contentDescription = null,
+                    tint = MaterialTheme.colors.primary,
+                )
+            }
+        }
         Row(
             modifier = Modifier.fillMaxWidth().padding(Spacing.xs),
         ) {
             Text(
-                modifier = Modifier.weight(1.75f),
+                modifier = Modifier.weight(1.78f),
                 text = "segmentation_rule_pattern_before".localized(),
                 style = MaterialTheme.typography.caption,
                 color = Color.White,
@@ -123,16 +144,12 @@ fun ProjectSegmentationScreen(
                 color = Color.White,
                 textAlign = TextAlign.End,
             )
-            Spacer(modifier = Modifier.width(Spacing.xs))
-            CustomTooltipArea(
-                text = "tooltip_add".localized(),
+            AnimatedVisibility(
+                visible = !uiState.applyDefaultRules,
+                enter = fadeIn(),
+                exit = fadeOut(),
             ) {
-                Icon(
-                    modifier = Modifier.size(22.dp).padding(1.dp).onClick { viewModel.createRule() },
-                    imageVector = Icons.Default.AddCircle,
-                    contentDescription = null,
-                    tint = MaterialTheme.colors.primary,
-                )
+                Spacer(modifier = Modifier.width(70.dp))
             }
         }
         LazyColumn(
@@ -185,6 +202,30 @@ fun ProjectSegmentationScreen(
                         Row {
                             val isEditing = idx == uiState.currentEditedRule
                             val iconModifier = Modifier.size(22.dp).padding(2.dp)
+                            CustomTooltipArea(
+                                text = "tooltip_move_up".localized(),
+                            ) {
+                                Icon(
+                                    modifier = iconModifier.onClick {
+                                        viewModel.moveRuleUp(index = idx)
+                                    },
+                                    imageVector = Icons.Default.ArrowCircleUp,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colors.primary,
+                                )
+                            }
+                            CustomTooltipArea(
+                                text = "tooltip_move_down".localized(),
+                            ) {
+                                Icon(
+                                    modifier = iconModifier.onClick {
+                                        viewModel.moveRuleDown(index = idx)
+                                    },
+                                    imageVector = Icons.Default.ArrowCircleDown,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colors.primary,
+                                )
+                            }
                             CustomTooltipArea(
                                 text = "tooltip_edit".localized(),
                             ) {

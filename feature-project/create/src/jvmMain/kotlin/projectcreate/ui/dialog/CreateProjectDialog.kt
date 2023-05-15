@@ -71,7 +71,7 @@ fun CreateProjectDialog(
                 modifier = Modifier.size(800.dp, 600.dp).background(MaterialTheme.colors.background)
                     .padding(horizontal = Spacing.s),
             ) {
-                val contentModifier = Modifier.fillMaxWidth().weight(1f)
+                val contentModifier = Modifier.fillMaxWidth().weight(1f).padding(Spacing.xs)
                 when (uiState.step) {
                     0 -> {
                         ProjectMetadataScreen(

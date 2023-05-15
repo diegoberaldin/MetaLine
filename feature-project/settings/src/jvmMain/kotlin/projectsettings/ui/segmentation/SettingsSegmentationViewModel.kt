@@ -144,4 +144,46 @@ class SettingsSegmentationViewModel(
             }
         }
     }
+
+    fun moveRuleUp(index: Int) {
+        if (index <= 0) {
+            return
+        }
+        currentEditedRule.value?.also {
+            toggleEditRule(it)
+        }
+        rules.getAndUpdate {
+            val newList = it.toMutableList()
+            newList.add(index - 1, newList.removeAt(index))
+            newList
+        }
+        updatePositions()
+    }
+
+    fun moveRuleDown(index: Int) {
+        if (index >= rules.value.size - 1) {
+            return
+        }
+        currentEditedRule.value?.also {
+            toggleEditRule(it)
+        }
+        rules.getAndUpdate {
+            val newList = it.toMutableList()
+            newList.add(index + 1, newList.removeAt(index))
+            newList
+        }
+        updatePositions()
+    }
+
+    private fun updatePositions() {
+        viewModelScope.launch(dispatcherProvider.io) {
+            rules.getAndUpdate {
+                val newList = it.mapIndexed { idx, rule ->
+                    rule.copy(position = idx)
+                }
+                segmentationRuleRepository.updateAll(newList)
+                newList
+            }
+        }
+    }
 }

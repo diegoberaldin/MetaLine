@@ -14,12 +14,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import repository.ProjectRepository
 import repository.SegmentationRuleRepository
 import usecase.GetCompleteLanguageUseCase
 
 class ProjectSegmentationViewModel(
     private val dispatcherProvider: CoroutineDispatcherProvider,
     private val segmentationRuleRepository: SegmentationRuleRepository,
+    private val projectRepository: ProjectRepository,
     private val completeLanguage: GetCompleteLanguageUseCase,
 ) : InstanceKeeper.Instance {
 
@@ -67,7 +69,7 @@ class ProjectSegmentationViewModel(
             setCurrentLanguage(currentLang)
         }
 
-        // TODO: read applyDefaultRules from DB
+        applyDefaultRules.value = project.applyDefaultSegmentationRules
     }
 
     fun setCurrentLanguage(lang: LanguageModel) {
@@ -152,13 +154,73 @@ class ProjectSegmentationViewModel(
         }
     }
 
+    fun moveRuleUp(index: Int) {
+        if (index <= 0) {
+            return
+        }
+        currentEditedRule.value?.also {
+            toggleEditRule(it)
+        }
+        rules.getAndUpdate {
+            val newList = it.toMutableList()
+            newList.add(index - 1, newList.removeAt(index))
+            newList
+        }
+        updatePositions()
+    }
+
+    fun moveRuleDown(index: Int) {
+        if (index >= rules.value.size - 1) {
+            return
+        }
+        currentEditedRule.value?.also {
+            toggleEditRule(it)
+        }
+        rules.getAndUpdate {
+            val newList = it.toMutableList()
+            newList.add(index + 1, newList.removeAt(index))
+            newList
+        }
+        updatePositions()
+    }
+
+    private fun updatePositions() {
+        viewModelScope.launch(dispatcherProvider.io) {
+            rules.getAndUpdate {
+                val newList = it.mapIndexed { idx, rule ->
+                    rule.copy(position = idx)
+                }
+                segmentationRuleRepository.updateAll(newList)
+                newList
+            }
+        }
+    }
+
     fun toggleApplyDefaultRules() {
         val newValue = !applyDefaultRules.value
         applyDefaultRules.value = newValue
-        // TODO: save flag in DB
-        // TODO: if newValue delete all project-specific rules, else copy for each language
-
+        val projectLanguages = availableLanguages.value.map { it.code }
         viewModelScope.launch(dispatcherProvider.io) {
+            val project = projectRepository.getById(projectId)
+            if (project != null) {
+                projectRepository.update(project.copy(applyDefaultSegmentationRules = newValue))
+            }
+
+            if (newValue) {
+                for (lang in projectLanguages) {
+                    val rules = segmentationRuleRepository.getAll(projectId = projectId, lang = lang)
+                    for (rule in rules) {
+                        segmentationRuleRepository.delete(rule)
+                    }
+                }
+            } else {
+                for (lang in projectLanguages) {
+                    val rules = segmentationRuleRepository.getAllDefault(lang = lang)
+                    for (rule in rules) {
+                        segmentationRuleRepository.create(model = rule, projectId = projectId)
+                    }
+                }
+            }
             refreshRules()
         }
     }

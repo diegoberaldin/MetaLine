@@ -6,4 +6,5 @@ data class SegmentationRuleModel(
     val before: String = "",
     val after: String = "",
     val lang: String = "",
+    val position: Int = 0,
 )

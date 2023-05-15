@@ -5,4 +5,5 @@ data class ProjectModel(
     val name: String = "",
     val sourceLang: String = "",
     val targetLang: String = "",
+    val applyDefaultSegmentationRules: Boolean = true,
 )

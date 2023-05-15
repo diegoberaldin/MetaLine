@@ -9,13 +9,15 @@ class SegmentationRuleRepository(
 ) {
 
     fun getInitialDefaultRules(): List<SegmentationRuleModel> = languageRepository.getDefaultLanguages().map {
-        SegmentationRuleModel(lang = it.code, before = "\\.", after = "\\s")
+        SegmentationRuleModel(lang = it.code, before = "\\\\.", after = "\\\\s")
     }
 
     suspend fun create(model: SegmentationRuleModel, projectId: Int? = null) =
         segmentationRuleDao.create(model = model, projectId = projectId)
 
     suspend fun update(model: SegmentationRuleModel) = segmentationRuleDao.update(model)
+
+    suspend fun updateAll(models: List<SegmentationRuleModel>) = segmentationRuleDao.updateAll(models)
 
     suspend fun delete(model: SegmentationRuleModel) = segmentationRuleDao.delete(model)
 

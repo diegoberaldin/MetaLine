@@ -8,6 +8,7 @@ val projectSegmentationModule = module {
         ProjectSegmentationViewModel(
             dispatcherProvider = get(),
             segmentationRuleRepository = get(),
+            projectRepository = get(),
             completeLanguage = get(),
         )
     }
