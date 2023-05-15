@@ -20,23 +20,20 @@ import common.log.LogManager
 import common.ui.components.CustomSaveFileDialog
 import common.ui.theme.MetaLineTheme
 import common.utils.AppBusiness
+import common.utils.AppBusiness.instanceKeeper
 import kotlinx.coroutines.runBlocking
 import main.di.mainModule
 import main.ui.MainScreen
 import main.ui.MainViewModel
 import org.koin.core.context.GlobalContext.startKoin
-import org.koin.java.KoinJavaComponent
 import org.koin.java.KoinJavaComponent.inject
 import persistence.di.persistenceModule
 import project.di.projectModule
 import projectcreate.ui.dialog.CreateProjectDialog
-import projectedit.ui.dialog.EditProjectDialog
-import projectmetadata.ui.ProjectMetadataViewModel
-import projectsegmentation.ui.ProjectSegmentationViewModel
+import projectcreate.ui.dialog.CreateProjectViewModel
 import projectsettings.ui.dialog.SettingsDialog
 import projectstatistics.ui.dialog.StatisticsDialog
 import repository.repositoryModule
-import usecase.InitializeDefaultSegmentationRulesUseCase
 import usecase.useCaseModule
 import java.util.*
 
@@ -56,41 +53,33 @@ fun initKoin() {
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
-    // init DI
     initKoin()
 
+    val keystore: TemporaryKeyStore by inject(TemporaryKeyStore::class.java)
+    val systemLanguage = Locale.getDefault().language
     runBlocking {
-        // init l10n
-        val keystore: TemporaryKeyStore by inject(TemporaryKeyStore::class.java)
-        val systemLanguage = Locale.getDefault().language
         val lang = keystore.get("lang", "")
         L10n.setLanguage(lang.ifEmpty { systemLanguage })
         if (lang.isEmpty()) {
             keystore.save("lang", "lang".localized())
         }
-
-        // init default segmentation rules
-        val initializeSegmentationRules: InitializeDefaultSegmentationRulesUseCase by inject(
-            InitializeDefaultSegmentationRulesUseCase::class.java,
-        )
-        initializeSegmentationRules()
     }
 
     val log: LogManager by inject(LogManager::class.java)
     log.debug("Application initialized")
 
+    val mainViewModel: MainViewModel = instanceKeeper.getOrCreate {
+        val res: MainViewModel by inject(MainViewModel::class.java)
+        res
+    }
+    val alignViewModel: AlignViewModel = instanceKeeper.getOrCreate {
+        val res: AlignViewModel by inject(AlignViewModel::class.java)
+        res
+    }
+
     Window(onCloseRequest = ::exitApplication, title = "app_name".localized()) {
         val lang by L10n.currentLanguage.collectAsState("lang".localized())
         LaunchedEffect(lang) {}
-
-        val mainViewModel: MainViewModel = AppBusiness.instanceKeeper.getOrCreate {
-            val res: MainViewModel by inject(MainViewModel::class.java)
-            res
-        }
-        val alignViewModel: AlignViewModel = AppBusiness.instanceKeeper.getOrCreate {
-            val res: AlignViewModel by inject(AlignViewModel::class.java)
-            res
-        }
 
         val mainUiState by mainViewModel.uiState.collectAsState()
         val alignEditUiState by alignViewModel.editUiState.collectAsState()
@@ -117,7 +106,7 @@ fun main() = application {
                     shortcut = KeyShortcut(Key.N, meta = true),
                 ) {
                     val vm = AppBusiness.instanceKeeper.getOrCreate {
-                        val res: ProjectMetadataViewModel by inject(ProjectMetadataViewModel::class.java)
+                        val res: CreateProjectViewModel by inject(CreateProjectViewModel::class.java)
                         res
                     }
                     vm.load(project = null)
@@ -231,7 +220,7 @@ fun main() = application {
         }
 
         if (editDialogOpen) {
-            EditProjectDialog(
+            CreateProjectDialog(
                 project = mainUiState.project,
                 onClose = {
                     editDialogOpen = false

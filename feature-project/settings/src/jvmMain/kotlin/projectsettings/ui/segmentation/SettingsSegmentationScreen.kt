@@ -20,8 +20,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.ArrowCircleDown
-import androidx.compose.material.icons.filled.ArrowCircleUp
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EditOff
@@ -34,7 +32,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.arkivanov.essenty.instancekeeper.getOrCreate
-import common.ui.components.CustomSpinner
 import common.ui.components.CustomTooltipArea
 import common.ui.theme.Indigo800
 import common.ui.theme.Purple800
@@ -64,36 +61,11 @@ fun SettingsSegmentationScreen(
             color = Color.White,
         )
         Spacer(modifier = Modifier.height(Spacing.xs))
-        val availableLanguages = uiState.availableLanguages
-        CustomSpinner(
-            modifier = Modifier.fillMaxWidth().height(20.dp),
-            values = availableLanguages.map { it.name },
-            current = uiState.currentLanguage?.name,
-            onValueChanged = {
-                val lang = availableLanguages[it]
-                viewModel.setCurrentLanguage(lang)
-            },
-        )
-        Spacer(modifier = Modifier.height(Spacing.xs))
-        Row {
-            val iconModifier = Modifier.size(22.dp).padding(1.dp)
-            Spacer(modifier = Modifier.weight(1f))
-            CustomTooltipArea(
-                text = "tooltip_add".localized(),
-            ) {
-                Icon(
-                    modifier = iconModifier.onClick { viewModel.createRule() },
-                    imageVector = Icons.Default.AddCircle,
-                    contentDescription = null,
-                    tint = MaterialTheme.colors.primary,
-                )
-            }
-        }
         Row(
             modifier = Modifier.fillMaxWidth().padding(Spacing.xs),
         ) {
             Text(
-                modifier = Modifier.weight(1.78f),
+                modifier = Modifier.weight(1.75f),
                 text = "segmentation_rule_pattern_before".localized(),
                 style = MaterialTheme.typography.caption,
                 color = Color.White,
@@ -111,7 +83,17 @@ fun SettingsSegmentationScreen(
                 color = Color.White,
                 textAlign = TextAlign.End,
             )
-            Spacer(modifier = Modifier.width(70.dp))
+            Spacer(modifier = Modifier.width(Spacing.xs))
+            CustomTooltipArea(
+                text = "tooltip_add".localized(),
+            ) {
+                Icon(
+                    modifier = Modifier.size(22.dp).padding(1.dp).onClick { viewModel.createRule() },
+                    imageVector = Icons.Default.AddCircle,
+                    contentDescription = null,
+                    tint = MaterialTheme.colors.primary,
+                )
+            }
         }
         LazyColumn(
             modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -157,30 +139,6 @@ fun SettingsSegmentationScreen(
                     Row {
                         val isEditing = idx == uiState.currentEditedRule
                         val iconModifier = Modifier.size(22.dp).padding(2.dp)
-                        CustomTooltipArea(
-                            text = "tooltip_move_up".localized(),
-                        ) {
-                            Icon(
-                                modifier = iconModifier.onClick {
-                                    viewModel.moveRuleUp(index = idx)
-                                },
-                                imageVector = Icons.Default.ArrowCircleUp,
-                                contentDescription = null,
-                                tint = MaterialTheme.colors.primary,
-                            )
-                        }
-                        CustomTooltipArea(
-                            text = "tooltip_move_down".localized(),
-                        ) {
-                            Icon(
-                                modifier = iconModifier.onClick {
-                                    viewModel.moveRuleDown(index = idx)
-                                },
-                                imageVector = Icons.Default.ArrowCircleDown,
-                                contentDescription = null,
-                                tint = MaterialTheme.colors.primary,
-                            )
-                        }
                         CustomTooltipArea(
                             text = "tooltip_edit".localized(),
                         ) {

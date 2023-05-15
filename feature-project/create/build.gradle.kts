@@ -31,9 +31,6 @@ kotlin {
                 implementation(projects.coreData)
                 implementation(projects.coreLocalization)
                 implementation(projects.coreRepository)
-
-                implementation(projects.featureProject.metadata)
-                implementation(projects.featureProject.segmentation)
             }
         }
     }

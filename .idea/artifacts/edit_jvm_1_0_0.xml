@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="edit-jvm-1.0.0">
-    <output-path>$PROJECT_DIR$/feature-project/edit/build/libs</output-path>
-    <root id="archive" name="edit-jvm-1.0.0.jar">
-      <element id="module-output" name="MetaLine.feature-project.edit.jvmMain" />
-    </root>
-  </artifact>
-</component>

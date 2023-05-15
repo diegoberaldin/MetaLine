@@ -32,7 +32,6 @@ kotlin {
                 implementation(projects.coreRepository)
 
                 implementation(projects.featureProject.create)
-                implementation(projects.featureProject.edit)
                 implementation(projects.featureProject.statistics)
                 implementation(projects.featureProject.settings)
                 implementation(projects.featureAlign)

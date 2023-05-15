@@ -1,6 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="edit-jvm-1.0-SNAPSHOT">
-    <output-path>$PROJECT_DIR$/feature-project/edit/build/libs</output-path>
-    <root id="archive" name="edit-jvm-1.0-SNAPSHOT.jar" />
-  </artifact>
-</component>
