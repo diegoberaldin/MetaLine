@@ -1,27 +1,37 @@
 package usecase
 
 import data.SegmentModel
+import repository.ProjectRepository
 import repository.SegmentationRuleRepository
 import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class SegmentTxtFileUseCase(
+    private val projectRepository: ProjectRepository,
     private val segmentationRuleRepository: SegmentationRuleRepository,
 ) {
 
     suspend operator fun invoke(path: String, lang: String, projectId: Int): List<SegmentModel> {
+        val project = projectRepository.getById(projectId) ?: return emptyList()
+        val rules = if (project.applyDefaultSegmentationRules) {
+            segmentationRuleRepository.getAllDefault(lang = lang)
+        } else {
+            segmentationRuleRepository.getAll(lang = lang, projectId = projectId)
+        }
+
         val content = suspendCoroutine {
             val res = runCatching {
                 File(path).readText()
             }.getOrElse { "" }
             it.resume(res)
         }
-        val rules = segmentationRuleRepository.getAll(lang = lang, projectId = projectId)
         val breakingPositions = mutableListOf<Int>()
         for (rule in rules) {
             val regex = Regex(rule.before + rule.after)
             val allMatches = regex.findAll(content)
+            val matches = allMatches.count()
+            println("found $matches matches")
             for (match in allMatches) {
                 val matchStart = match.range.first
                 val matchEnd = match.range.last

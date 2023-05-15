@@ -9,7 +9,7 @@ class SegmentationRuleRepository(
 ) {
 
     fun getInitialDefaultRules(): List<SegmentationRuleModel> = languageRepository.getDefaultLanguages().map {
-        SegmentationRuleModel(lang = it.code, before = "\\\\.", after = "\\\\s")
+        SegmentationRuleModel(lang = it.code, before = "\\.", after = "\\s")
     }
 
     suspend fun create(model: SegmentationRuleModel, projectId: Int? = null) =

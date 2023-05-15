@@ -20,6 +20,7 @@ val useCaseModule = module {
     }
     single {
         SegmentTxtFileUseCase(
+            projectRepository = get(),
             segmentationRuleRepository = get(),
         )
     }
