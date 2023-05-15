@@ -30,6 +30,7 @@ val repositoryModule = module {
     single {
         SegmentationRuleRepository(
             segmentationRuleDao = get(),
+            languageRepository = get(),
         )
     }
 }

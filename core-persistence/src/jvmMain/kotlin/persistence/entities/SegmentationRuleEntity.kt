@@ -8,6 +8,7 @@ object SegmentationRuleEntity : IntIdTable() {
     val after = mediumText("after")
     val breaking = bool("breaking")
     val lang = varchar("lang", 2)
+    val position = integer("position")
     val projectId =
         reference(name = "projectId", foreign = ProjectEntity, onDelete = ReferenceOption.CASCADE).nullable()
 }

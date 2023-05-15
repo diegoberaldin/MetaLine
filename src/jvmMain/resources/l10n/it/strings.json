@@ -377,7 +377,7 @@
   },
   {
     "key": "segmentation_rules_default_intro",
-    "value": "Regole di segmentazione di default per i nuovi progetti (per ogni lingua)"
+    "value": "Regole di segmentazione di default e indipendenti dal progetto (salvo diversamente specificato)"
   },
   {
     "key": "segmentation_rule_pattern_before",
@@ -390,5 +390,17 @@
   {
     "key": "segmentation_rule_break_exception",
     "value": "Interr./Ecc."
+  },
+  {
+    "key": "dialog_title_edit_project",
+    "value": "Modifica progetto"
+  },
+  {
+    "key": "dialog_project_metadata",
+    "value": "Metadati"
+  },
+  {
+    "key": "segmentation_rules_project_intro",
+    "value": "Sovrascrivi le opzioni di default con regole specifiche di progetto"
   }
 ]
