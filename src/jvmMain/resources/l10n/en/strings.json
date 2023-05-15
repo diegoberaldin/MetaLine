@@ -377,7 +377,7 @@
   },
   {
     "key": "segmentation_rules_default_intro",
-    "value": "Default segmentation rules that will be added to each new project (for each language)"
+    "value": "Default segmentation rules for every project (unless specified differently)"
   },
   {
     "key": "segmentation_rule_pattern_before",
@@ -390,5 +390,17 @@
   {
     "key": "segmentation_rule_break_exception",
     "value": "Break/Exc."
+  },
+  {
+    "key": "dialog_title_edit_project",
+    "value": "Edit project"
+  },
+  {
+    "key": "dialog_project_metadata",
+    "value": "Metadata"
+  },
+  {
+    "key": "segmentation_rules_project_intro",
+    "value": "Override default with project-specific rules"
   }
 ]

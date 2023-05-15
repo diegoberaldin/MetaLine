@@ -14,13 +14,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import localized
-import repository.FlagsRepository
-import repository.LanguageNameRepository
+import usecase.GetCompleteLanguageUseCase
 
 class SettingsGeneralViewModel(
     private val dispatcherProvider: CoroutineDispatcherProvider,
-    private val languageNameRepository: LanguageNameRepository,
-    private val flagsRepository: FlagsRepository,
+    private val completeLanguage: GetCompleteLanguageUseCase,
     private val keyStore: TemporaryKeyStore,
 ) : InstanceKeeper.Instance {
 
@@ -50,25 +48,19 @@ class SettingsGeneralViewModel(
         appVersion.value = System.getProperty("jpackage.app-version") ?: "[debug]"
         viewModelScope.launch(dispatcherProvider.io) {
             val langCode = "lang".localized()
-            appLanguage.value = LanguageModel(code = langCode, name = getLanguageName(langCode))
+            appLanguage.value = completeLanguage(LanguageModel(code = langCode))
         }
 
         availableLanguages.value = listOf(
             "en",
             "it",
         ).map {
-            LanguageModel(code = it, name = getLanguageName(it))
+            completeLanguage(LanguageModel(code = it))
         }
     }
 
     override fun onDestroy() {
         viewModelScope.cancel()
-    }
-
-    private fun getLanguageName(code: String): String = buildString {
-        append(flagsRepository.getFlag(code))
-        append(" ")
-        append(languageNameRepository.getName(code))
     }
 
     fun setLanguage(value: LanguageModel) {

@@ -12,8 +12,7 @@ val projectSettingsModule = module {
     factory {
         SettingsGeneralViewModel(
             dispatcherProvider = get(),
-            languageNameRepository = get(),
-            flagsRepository = get(),
+            completeLanguage = get(),
             keyStore = get(),
         )
     }
@@ -21,6 +20,8 @@ val projectSettingsModule = module {
         SettingsSegmentationViewModel(
             dispatcherProvider = get(),
             segmentationRuleRepository = get(),
+            languageRepository = get(),
+            completeLanguage = get(),
         )
     }
 }

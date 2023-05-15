@@ -17,6 +17,7 @@ class ProjectDAO {
             it[name] = model.name
             it[sourceLang] = model.sourceLang
             it[targetLang] = model.targetLang
+            it[applyDefaultSegmentationRules] = model.applyDefaultSegmentationRules
         }[ProjectEntity.id].value
     }
 
@@ -25,6 +26,7 @@ class ProjectDAO {
             it[name] = model.name
             it[sourceLang] = model.sourceLang
             it[targetLang] = model.targetLang
+            it[applyDefaultSegmentationRules] = model.applyDefaultSegmentationRules
         }
     }
 
@@ -45,5 +47,6 @@ class ProjectDAO {
         name = this[ProjectEntity.name],
         sourceLang = this[ProjectEntity.sourceLang],
         targetLang = this[ProjectEntity.targetLang],
+        applyDefaultSegmentationRules = this[ProjectEntity.applyDefaultSegmentationRules],
     )
 }

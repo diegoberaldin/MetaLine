@@ -2,19 +2,14 @@ package projectcreate.di
 
 import org.koin.dsl.module
 import projectcreate.ui.dialog.CreateProjectViewModel
+import projectmetadata.di.projectMetadataModule
+import projectsegmentation.di.projectSegmentationModule
 
 val projectCreateModule = module {
+    includes(projectMetadataModule)
+    includes(projectSegmentationModule)
+
     factory {
-        CreateProjectViewModel(
-            dispatcherProvider = get(),
-            languageRepository = get(),
-            languageNameRepository = get(),
-            flagsRepository = get(),
-            segmentUseCase = get(),
-            projectRepository = get(),
-            filePairRepository = get(),
-            segmentRepository = get(),
-            notificationCenter = get(),
-        )
+        CreateProjectViewModel()
     }
 }
