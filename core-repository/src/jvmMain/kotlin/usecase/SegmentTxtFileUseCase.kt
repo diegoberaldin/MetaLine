@@ -1,20 +1,25 @@
 package usecase
 
 import data.SegmentModel
-import data.SegmentationRuleModel
+import repository.ProjectRepository
+import repository.SegmentationRuleRepository
 import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class SegmentTxtFileUseCase {
+class SegmentTxtFileUseCase(
+    private val projectRepository: ProjectRepository,
+    private val segmentationRuleRepository: SegmentationRuleRepository,
+) {
 
-    data class Input(
-        val rules: List<SegmentationRuleModel> = listOf(
-            SegmentationRuleModel(before = "\\.", after = "\\s"),
-        ),
-    )
+    suspend operator fun invoke(path: String, lang: String, projectId: Int): List<SegmentModel> {
+        val project = projectRepository.getById(projectId) ?: return emptyList()
+        val rules = if (project.applyDefaultSegmentationRules) {
+            segmentationRuleRepository.getAllDefault(lang = lang)
+        } else {
+            segmentationRuleRepository.getAll(lang = lang, projectId = projectId)
+        }
 
-    suspend operator fun invoke(path: String, input: Input = Input()): List<SegmentModel> {
         val content = suspendCoroutine {
             val res = runCatching {
                 File(path).readText()
@@ -22,10 +27,11 @@ class SegmentTxtFileUseCase {
             it.resume(res)
         }
         val breakingPositions = mutableListOf<Int>()
-
-        for (rule in input.rules.reversed()) {
+        for (rule in rules) {
             val regex = Regex(rule.before + rule.after)
             val allMatches = regex.findAll(content)
+            val matches = allMatches.count()
+            println("found $matches matches")
             for (match in allMatches) {
                 val matchStart = match.range.first
                 val matchEnd = match.range.last
