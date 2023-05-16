@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="segmentation-jvm-1.0.0">
+    <output-path>$PROJECT_DIR$/feature-project/segmentation/build/libs</output-path>
+    <root id="archive" name="segmentation-jvm-1.0.0.jar">
+      <element id="module-output" name="MetaLine.feature-project.segmentation.jvmMain" />
+    </root>
+  </artifact>
+</component>

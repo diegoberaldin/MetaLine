@@ -25,14 +25,12 @@ import main.di.mainModule
 import main.ui.MainScreen
 import main.ui.MainViewModel
 import org.koin.core.context.GlobalContext.startKoin
-import org.koin.java.KoinJavaComponent
 import org.koin.java.KoinJavaComponent.inject
 import persistence.di.persistenceModule
 import project.di.projectModule
 import projectcreate.ui.dialog.CreateProjectDialog
 import projectedit.ui.dialog.EditProjectDialog
 import projectmetadata.ui.ProjectMetadataViewModel
-import projectsegmentation.ui.ProjectSegmentationViewModel
 import projectsettings.ui.dialog.SettingsDialog
 import projectstatistics.ui.dialog.StatisticsDialog
 import repository.repositoryModule
@@ -40,7 +38,7 @@ import usecase.InitializeDefaultSegmentationRulesUseCase
 import usecase.useCaseModule
 import java.util.*
 
-fun initKoin() {
+private fun initKoin() {
     startKoin {
         modules(
             commonModule,
