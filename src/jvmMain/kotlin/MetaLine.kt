@@ -53,221 +53,223 @@ private fun initKoin() {
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
-fun main() = application {
+fun main() {
     // init DI
     initKoin()
-
-    runBlocking {
-        // init l10n
-        val keystore: TemporaryKeyStore by inject(TemporaryKeyStore::class.java)
-        val systemLanguage = Locale.getDefault().language
-        val lang = keystore.get("lang", "")
-        L10n.setLanguage(lang.ifEmpty { systemLanguage })
-        if (lang.isEmpty()) {
-            keystore.save("lang", "lang".localized())
-        }
-
-        // init default segmentation rules
-        val initializeSegmentationRules: InitializeDefaultSegmentationRulesUseCase by inject(
-            InitializeDefaultSegmentationRulesUseCase::class.java,
-        )
-        initializeSegmentationRules()
-    }
-
     val log: LogManager by inject(LogManager::class.java)
-    log.debug("Application initialized")
 
-    Window(onCloseRequest = ::exitApplication, title = "app_name".localized()) {
-        val lang by L10n.currentLanguage.collectAsState("lang".localized())
-        LaunchedEffect(lang) {}
+    application {
+        log.debug("Application initialized")
 
-        val mainViewModel: MainViewModel = AppBusiness.instanceKeeper.getOrCreate {
-            val res: MainViewModel by inject(MainViewModel::class.java)
-            res
-        }
-        val alignViewModel: AlignViewModel = AppBusiness.instanceKeeper.getOrCreate {
-            val res: AlignViewModel by inject(AlignViewModel::class.java)
-            res
-        }
+        runBlocking {
+            // init l10n
+            val keystore: TemporaryKeyStore by inject(TemporaryKeyStore::class.java)
+            val systemLanguage = Locale.getDefault().language
+            val lang = keystore.get("lang", "")
+            L10n.setLanguage(lang.ifEmpty { systemLanguage })
+            if (lang.isEmpty()) {
+                keystore.save("lang", "lang".localized())
+            }
 
-        val mainUiState by mainViewModel.uiState.collectAsState()
-        val alignEditUiState by alignViewModel.editUiState.collectAsState()
-        var newDialogOpen by remember {
-            mutableStateOf(false)
-        }
-        var editDialogOpen by remember {
-            mutableStateOf(false)
-        }
-        var statisticsDialogOpen by remember {
-            mutableStateOf(false)
-        }
-        var settingsDialogOpen by remember {
-            mutableStateOf(false)
-        }
-        var exportDialogOpen by remember {
-            mutableStateOf(false)
+            // init default segmentation rules
+            val initializeSegmentationRules: InitializeDefaultSegmentationRulesUseCase by inject(
+                InitializeDefaultSegmentationRulesUseCase::class.java,
+            )
+            initializeSegmentationRules()
         }
 
-        MenuBar {
-            Menu("menu_project".localized()) {
-                Item(
-                    text = "menu_project_new".localized(),
-                    shortcut = KeyShortcut(Key.N, meta = true),
-                ) {
-                    val vm = AppBusiness.instanceKeeper.getOrCreate {
-                        val res: ProjectMetadataViewModel by inject(ProjectMetadataViewModel::class.java)
-                        res
+        Window(onCloseRequest = ::exitApplication, title = "app_name".localized()) {
+            val lang by L10n.currentLanguage.collectAsState("lang".localized())
+            LaunchedEffect(lang) {}
+
+            val mainViewModel: MainViewModel = AppBusiness.instanceKeeper.getOrCreate {
+                val res: MainViewModel by inject(MainViewModel::class.java)
+                res
+            }
+            val alignViewModel: AlignViewModel = AppBusiness.instanceKeeper.getOrCreate {
+                val res: AlignViewModel by inject(AlignViewModel::class.java)
+                res
+            }
+
+            val mainUiState by mainViewModel.uiState.collectAsState()
+            val alignEditUiState by alignViewModel.editUiState.collectAsState()
+            var newDialogOpen by remember {
+                mutableStateOf(false)
+            }
+            var editDialogOpen by remember {
+                mutableStateOf(false)
+            }
+            var statisticsDialogOpen by remember {
+                mutableStateOf(false)
+            }
+            var settingsDialogOpen by remember {
+                mutableStateOf(false)
+            }
+            var exportDialogOpen by remember {
+                mutableStateOf(false)
+            }
+
+            MenuBar {
+                Menu("menu_project".localized()) {
+                    Item(
+                        text = "menu_project_new".localized(),
+                        shortcut = KeyShortcut(Key.N, meta = true),
+                    ) {
+                        val vm = AppBusiness.instanceKeeper.getOrCreate {
+                            val res: ProjectMetadataViewModel by inject(ProjectMetadataViewModel::class.java)
+                            res
+                        }
+                        vm.load(project = null)
+                        newDialogOpen = true
                     }
-                    vm.load(project = null)
-                    newDialogOpen = true
+                    Item(
+                        text = "menu_project_edit".localized(),
+                        enabled = mainUiState.project != null,
+                    ) {
+                        editDialogOpen = true
+                    }
+                    Item(
+                        text = "menu_project_save".localized(),
+                        enabled = alignEditUiState.needsSaving,
+                        shortcut = KeyShortcut(Key.S, meta = true),
+                    ) {
+                        alignViewModel.save()
+                    }
+                    Item(
+                        text = "menu_project_close".localized(),
+                        enabled = mainUiState.project != null,
+                    ) {
+                        mainViewModel.closeProject()
+                    }
+                    Separator()
+                    Item(
+                        text = "menu_project_settings".localized(),
+                        shortcut = KeyShortcut(Key.Comma, meta = true),
+                    ) {
+                        settingsDialogOpen = true
+                    }
+                    Item(
+                        text = "menu_project_statistics".localized(),
+                        enabled = mainUiState.project != null,
+                    ) {
+                        statisticsDialogOpen = true
+                    }
+                    Separator()
+                    Item(
+                        text = "menu_project_export".localized(),
+                        enabled = mainUiState.project != null,
+                    ) {
+                        exportDialogOpen = true
+                    }
                 }
-                Item(
-                    text = "menu_project_edit".localized(),
-                    enabled = mainUiState.project != null,
-                ) {
-                    editDialogOpen = true
-                }
-                Item(
-                    text = "menu_project_save".localized(),
-                    enabled = alignEditUiState.needsSaving,
-                    shortcut = KeyShortcut(Key.S, meta = true),
-                ) {
-                    alignViewModel.save()
-                }
-                Item(
-                    text = "menu_project_close".localized(),
-                    enabled = mainUiState.project != null,
-                ) {
-                    mainViewModel.closeProject()
-                }
-                Separator()
-                Item(
-                    text = "menu_project_settings".localized(),
-                    shortcut = KeyShortcut(Key.Comma, meta = true),
-                ) {
-                    settingsDialogOpen = true
-                }
-                Item(
-                    text = "menu_project_statistics".localized(),
-                    enabled = mainUiState.project != null,
-                ) {
-                    statisticsDialogOpen = true
-                }
-                Separator()
-                Item(
-                    text = "menu_project_export".localized(),
-                    enabled = mainUiState.project != null,
-                ) {
-                    exportDialogOpen = true
+                Menu("menu_segment".localized()) {
+                    Item(
+                        text = "menu_segment_move_up".localized(),
+                        shortcut = KeyShortcut(Key.DirectionUp, meta = true),
+                    ) {
+                        alignViewModel.moveSegmentUp()
+                    }
+                    Item(
+                        text = "menu_segment_move_down".localized(),
+                        shortcut = KeyShortcut(Key.DirectionDown, meta = true),
+                    ) {
+                        alignViewModel.moveSegmentDown()
+                    }
+                    Separator()
+                    Item(
+                        text = "menu_segment_merge_previous".localized(),
+                        shortcut = KeyShortcut(Key.DirectionUp, meta = true, shift = true),
+                    ) {
+                        alignViewModel.mergeWithPreviousSegment()
+                    }
+                    Item(
+                        text = "menu_segment_merge_next".localized(),
+                        shortcut = KeyShortcut(Key.DirectionDown, meta = true, shift = true),
+                    ) {
+                        alignViewModel.mergeWithNextSegment()
+                    }
+                    Separator()
+                    Item(
+                        text = "menu_segment_create_before".localized(),
+                        shortcut = KeyShortcut(Key.Enter, meta = true, shift = true),
+                    ) {
+                        alignViewModel.createSegmentBefore()
+                    }
+                    Item(
+                        text = "menu_segment_create_after".localized(),
+                        shortcut = KeyShortcut(Key.Enter, meta = true),
+                    ) {
+                        alignViewModel.createSegmentAfter()
+                    }
+                    Separator()
+                    Item(
+                        text = if (alignEditUiState.isEditing) "menu_segment_exit_edit".localized() else "menu_segment_edit".localized(),
+                        shortcut = KeyShortcut(Key.E, meta = true),
+                    ) {
+                        alignViewModel.toggleEditing()
+                    }
+                    Item(text = "menu_segment_split".localized(), shortcut = KeyShortcut(Key.T, meta = true)) {
+                        alignViewModel.splitSegment()
+                    }
+                    Item(text = "menu_segment_delete".localized(), shortcut = KeyShortcut(Key.Backspace, meta = true)) {
+                        alignViewModel.deleteSegment()
+                    }
                 }
             }
-            Menu("menu_segment".localized()) {
-                Item(
-                    text = "menu_segment_move_up".localized(),
-                    shortcut = KeyShortcut(Key.DirectionUp, meta = true),
-                ) {
-                    alignViewModel.moveSegmentUp()
-                }
-                Item(
-                    text = "menu_segment_move_down".localized(),
-                    shortcut = KeyShortcut(Key.DirectionDown, meta = true),
-                ) {
-                    alignViewModel.moveSegmentDown()
-                }
-                Separator()
-                Item(
-                    text = "menu_segment_merge_previous".localized(),
-                    shortcut = KeyShortcut(Key.DirectionUp, meta = true, shift = true),
-                ) {
-                    alignViewModel.mergeWithPreviousSegment()
-                }
-                Item(
-                    text = "menu_segment_merge_next".localized(),
-                    shortcut = KeyShortcut(Key.DirectionDown, meta = true, shift = true),
-                ) {
-                    alignViewModel.mergeWithNextSegment()
-                }
-                Separator()
-                Item(
-                    text = "menu_segment_create_before".localized(),
-                    shortcut = KeyShortcut(Key.Enter, meta = true, shift = true),
-                ) {
-                    alignViewModel.createSegmentBefore()
-                }
-                Item(
-                    text = "menu_segment_create_after".localized(),
-                    shortcut = KeyShortcut(Key.Enter, meta = true),
-                ) {
-                    alignViewModel.createSegmentAfter()
-                }
-                Separator()
-                Item(
-                    text = if (alignEditUiState.isEditing) "menu_segment_exit_edit".localized() else "menu_segment_edit".localized(),
-                    shortcut = KeyShortcut(Key.E, meta = true),
-                ) {
-                    alignViewModel.toggleEditing()
-                }
-                Item(text = "menu_segment_split".localized(), shortcut = KeyShortcut(Key.T, meta = true)) {
-                    alignViewModel.splitSegment()
-                }
-                Item(text = "menu_segment_delete".localized(), shortcut = KeyShortcut(Key.Backspace, meta = true)) {
-                    alignViewModel.deleteSegment()
-                }
-            }
-        }
-        App()
+            App()
 
-        if (newDialogOpen) {
-            CreateProjectDialog(
-                onClose = { project ->
-                    newDialogOpen = false
-                    if (project != null) {
-                        mainViewModel.openProject(project)
-                    }
-                },
-            )
-        }
-
-        if (editDialogOpen) {
-            EditProjectDialog(
-                project = mainUiState.project,
-                onClose = {
-                    editDialogOpen = false
-                },
-            )
-        }
-
-        if (statisticsDialogOpen) {
-            mainUiState.project?.also {
-                StatisticsDialog(
-                    project = it,
-                    onClose = {
-                        statisticsDialogOpen = false
+            if (newDialogOpen) {
+                CreateProjectDialog(
+                    onClose = { project ->
+                        newDialogOpen = false
+                        if (project != null) {
+                            mainViewModel.openProject(project)
+                        }
                     },
                 )
             }
-        }
 
-        if (settingsDialogOpen) {
-            SettingsDialog(
-                onClose = {
-                    settingsDialogOpen = false
-                },
-            )
-        }
+            if (editDialogOpen) {
+                EditProjectDialog(
+                    project = mainUiState.project,
+                    onClose = {
+                        editDialogOpen = false
+                    },
+                )
+            }
 
-        if (exportDialogOpen) {
-            CustomSaveFileDialog(
-                title = "dialog_title_export".localized(),
-                initialFileName = "memory.tmx",
-                nameFilter = { it.endsWith("tmx") },
-                onCloseRequest = {
-                    exportDialogOpen = false
-                    it?.also {
-                        mainViewModel.exportTmx(path = it)
-                    }
-                },
-            )
+            if (statisticsDialogOpen) {
+                mainUiState.project?.also {
+                    StatisticsDialog(
+                        project = it,
+                        onClose = {
+                            statisticsDialogOpen = false
+                        },
+                    )
+                }
+            }
+
+            if (settingsDialogOpen) {
+                SettingsDialog(
+                    onClose = {
+                        settingsDialogOpen = false
+                    },
+                )
+            }
+
+            if (exportDialogOpen) {
+                CustomSaveFileDialog(
+                    title = "dialog_title_export".localized(),
+                    initialFileName = "memory.tmx",
+                    nameFilter = { it.endsWith("tmx") },
+                    onCloseRequest = {
+                        exportDialogOpen = false
+                        it?.also {
+                            mainViewModel.exportTmx(path = it)
+                        }
+                    },
+                )
+            }
         }
     }
 }
