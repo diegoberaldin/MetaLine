@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+	<string name="app_intro">Please open an alignment project by selecting one of the following items.</string>
+	<string name="app_intro_empty">It seems like you don\'t have any project yet.\nYou can create a new one by using the "Project" > "New…" menu to start.</string>
+	<string name="app_intro_title">Thank you for using MetaLine!</string>
+	<string name="app_name" translatable="false">MetaLine</string>
+	<string name="button_cancel">Cancel</string>
+	<string name="button_close">Close</string>
+	<string name="button_ok">OK</string>
+	<string name="create_project_file_pairs">File pairs</string>
+	<string name="create_project_name">Name</string>
+	<string name="create_project_source_language">Source language</string>
+	<string name="create_project_target_language">Target language</string>
+	<string name="dialog_project_metadata">Metadata</string>
+	<string name="dialog_settings_language">App language:</string>
+	<string name="dialog_settings_tab_general">General</string>
+	<string name="dialog_settings_tab_segmentation">Segmentation rules</string>
+	<string name="dialog_settings_version">App version:</string>
+	<string name="dialog_statistics_item_completion">Completion</string>
+	<string name="dialog_statistics_item_total_file_pairs">File pairs</string>
+	<string name="dialog_statistics_item_translation_units">Translation units</string>
+	<string name="dialog_statistics_section_file_pairs">Project files</string>
+	<string name="dialog_statistics_section_general">General</string>
+	<string name="dialog_title_create_project">Create new project</string>
+	<string name="dialog_title_edit_project">Edit project</string>
+	<string name="dialog_title_export">Select export destination</string>
+	<string name="dialog_title_open_file">Select a file</string>
+	<string name="dialog_title_settings">Settings</string>
+	<string name="dialog_title_statistics">Project statistics</string>
+	<string name="file_list_placeholder">Please add a file using the "+" button</string>
+	<string name="lang">en</string>
+	<string name="language_bulgarian" translatable="false">Вългарски</string>
+	<string name="language_croatian" translatable="false">Hrvatski</string>
+	<string name="language_czech" translatable="false">Čeština</string>
+	<string name="language_danish" translatable="false">Dansk</string>
+	<string name="language_dutch" translatable="false">Nederlands</string>
+	<string name="language_english" translatable="false">English</string>
+	<string name="language_estonian" translatable="false">Eesti</string>
+	<string name="language_finnish" translatable="false">Suomi</string>
+	<string name="language_french" translatable="false">Français</string>
+	<string name="language_german" translatable="false">Deutsch</string>
+	<string name="language_greek" translatable="false">Ελληνικά</string>
+	<string name="language_hungarian" translatable="false">Magyar</string>
+	<string name="language_irish" translatable="false">Gaeilge</string>
+	<string name="language_italian" translatable="false">Italiano</string>
+	<string name="language_latvian" translatable="false">Latviešu</string>
+	<string name="language_lithuanian" translatable="false">Lietuvių</string>
+	<string name="language_maltese" translatable="false">Malti</string>
+	<string name="language_polish" translatable="false">Polski</string>
+	<string name="language_portuguese" translatable="false">Português</string>
+	<string name="language_romanian" translatable="false">Română</string>
+	<string name="language_slovak" translatable="false">Slovenčina</string>
+	<string name="language_slovenian" translatable="false">Slovenščina</string>
+	<string name="language_spanish" translatable="false">Español</string>
+	<string name="language_swedish" translatable="false">Svenska</string>
+	<string name="menu_project">Project</string>
+	<string name="menu_project_close">Close</string>
+	<string name="menu_project_edit">Edit…</string>
+	<string name="menu_project_export">Export to TMX…</string>
+	<string name="menu_project_new">New…</string>
+	<string name="menu_project_save">Save</string>
+	<string name="menu_project_settings">Settings…</string>
+	<string name="menu_project_statistics">Statistics…</string>
+	<string name="menu_segment">Segment</string>
+	<string name="menu_segment_create_after">Create after</string>
+	<string name="menu_segment_create_before">Create before</string>
+	<string name="menu_segment_delete">Delete</string>
+	<string name="menu_segment_edit">Edit</string>
+	<string name="menu_segment_exit_edit">Close edit</string>
+	<string name="menu_segment_merge_next">Merge with next</string>
+	<string name="menu_segment_merge_previous">Merge with previous</string>
+	<string name="menu_segment_move_down">Move down</string>
+	<string name="menu_segment_move_up">Move up</string>
+	<string name="menu_segment_split">Split</string>
+	<string name="message_error_missing_files">Please select at least a file pair</string>
+	<string name="message_error_missing_name">Please choose a name for the project</string>
+	<string name="message_error_missing_source_language">Please select a source language</string>
+	<string name="message_error_missing_target_language">Please select a target language</string>
+	<string name="message_error_not_matching_file_number">Please select the same number of source and target files</string>
+	<string name="message_project_empty">Please select one or more file pairs:</string>
+	<string name="segmentation_rule_break_exception">Break/Exc.</string>
+	<string name="segmentation_rule_pattern_after">Pattern after</string>
+	<string name="segmentation_rule_pattern_before">Pattern before</string>
+	<string name="segmentation_rules_default_intro">Default segmentation rules for every project (unless specified differently)</string>
+	<string name="segmentation_rules_project_intro">Override default with project-specific rules</string>
+	<string name="select_placeholder">Select…</string>
+	<string name="sidebar_title_project_files">Project files</string>
+	<string name="status_bar_file_pairs">file pairs:</string>
+	<string name="status_bar_project">project: </string>
+	<string name="tooltip_add">Add</string>
+	<string name="tooltip_delete">Delete</string>
+	<string name="tooltip_edit">Edit</string>
+	<string name="tooltip_exit_edit">Exit edit mode</string>
+	<string name="tooltip_merge_next">Merge with next segment</string>
+	<string name="tooltip_merge_previous">Merge with previous segment</string>
+	<string name="tooltip_move_down">Move down</string>
+	<string name="tooltip_move_up">Move up</string>
+	<string name="tooltip_new_after">Create new segment after</string>
+	<string name="tooltip_new_before">Create new segment before</string>
+	<string name="tooltip_project_files">Project files</string>
+	<string name="tooltip_remove">Remove</string>
+	<string name="tooltip_save">Save</string>
+	<string name="tooltip_split">Split segment</string>
+</resources>
