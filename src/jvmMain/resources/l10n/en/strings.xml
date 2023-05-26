@@ -85,8 +85,8 @@
 	<string name="segmentation_rules_project_intro">Override default with project-specific rules</string>
 	<string name="select_placeholder">Select…</string>
 	<string name="sidebar_title_project_files">Project files</string>
-	<string name="status_bar_file_pairs">file pairs:</string>
-	<string name="status_bar_project">project: </string>
+	<string name="status_bar_file_pairs">file pairs: %d</string>
+	<string name="status_bar_project">project: %s</string>
 	<string name="tooltip_add">Add</string>
 	<string name="tooltip_delete">Delete</string>
 	<string name="tooltip_edit">Edit</string>

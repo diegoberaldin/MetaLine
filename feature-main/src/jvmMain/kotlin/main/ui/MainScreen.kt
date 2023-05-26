@@ -114,11 +114,9 @@ internal fun ProjectContainer(
         ) {
             Text(
                 text = buildString {
-                    append("status_bar_project".localized())
-                    append(currentProject.name)
-                    append(", ")
-                    append("status_bar_file_pairs".localized())
-                    append(uiState.filePairs.size)
+                    append("status_bar_project".localized(currentProject.name))
+                    append(" – ")
+                    append("status_bar_file_pairs".localized(uiState.filePairs.size))
                 },
                 style = MaterialTheme.typography.caption.copy(fontSize = 10.sp),
                 color = Color.White,
