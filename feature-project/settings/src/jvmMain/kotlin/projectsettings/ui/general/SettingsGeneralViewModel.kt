@@ -54,6 +54,7 @@ class SettingsGeneralViewModel(
         availableLanguages.value = listOf(
             "en",
             "it",
+            "es",
         ).map {
             completeLanguage(LanguageModel(code = it))
         }
