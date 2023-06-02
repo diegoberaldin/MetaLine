@@ -35,7 +35,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
-import mainintro.ui.IntroViewModel
+import mainintro.ui.IntroComponent
 import repository.FilePairRepository
 import repository.ProjectRepository
 import repository.SegmentRepository
@@ -69,7 +69,7 @@ internal class DefaultMainComponent(
         key = "MainMainSlot",
         childFactory = { config, context ->
             when (config) {
-                MainComponent.MainConfig.Intro -> getByInjection<IntroViewModel>()
+                MainComponent.MainConfig.Intro -> getByInjection<IntroComponent>(context, coroutineContext)
                 MainComponent.MainConfig.Alignment -> getByInjection<AlignComponent>(context, coroutineContext)
                 else -> Unit
             }
@@ -166,7 +166,9 @@ internal class DefaultMainComponent(
         filePairs.value = emptyList()
         openFilePairs.value = emptyList()
         currentFilePairIndex.value = null
-        mainNavigation.activate(MainComponent.MainConfig.Intro)
+        viewModelScope.launch(dispatcherProvider.main) {
+            mainNavigation.activate(MainComponent.MainConfig.Intro)
+        }
     }
 
     private suspend fun openProject(id: Int) {

@@ -24,7 +24,8 @@ kotlin {
                 implementation(compose.materialIconsExtended)
 
                 implementation(libs.koin)
-                implementation(libs.essenty.instancekeeper)
+                implementation(libs.decompose)
+                implementation(libs.decompose.extensions)
                 implementation(libs.redundent)
 
                 implementation(projects.coreCommon)

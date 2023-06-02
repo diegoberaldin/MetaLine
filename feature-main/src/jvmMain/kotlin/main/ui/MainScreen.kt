@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import common.ui.theme.Spacing
 import localized
+import mainintro.ui.IntroComponent
 import mainintro.ui.IntroScreen
 import project.ui.ChooseFilePairScreen
 import project.ui.ProjectScreen
@@ -42,6 +43,7 @@ fun MainScreen(
         when (main.child?.configuration) {
             MainComponent.MainConfig.Intro -> {
                 IntroScreen(
+                    component = main.child?.instance as IntroComponent,
                     modifier = Modifier.fillMaxSize(),
                 )
             }

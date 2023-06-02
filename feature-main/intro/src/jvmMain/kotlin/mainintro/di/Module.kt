@@ -1,11 +1,14 @@
 package mainintro.di
 
+import mainintro.ui.DefaultIntroComponent
+import mainintro.ui.IntroComponent
 import org.koin.dsl.module
-import mainintro.ui.IntroViewModel
 
 val projectIntroModule = module {
-    factory {
-        IntroViewModel(
+    factory<IntroComponent> {
+        DefaultIntroComponent(
+            componentContext = it[0],
+            coroutineContext = it[1],
             dispatcherProvider = get(),
             projectRepository = get(),
             notificationCenter = get(),
