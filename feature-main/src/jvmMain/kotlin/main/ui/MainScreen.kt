@@ -72,7 +72,9 @@ internal fun ProjectContainer(
     LaunchedEffect(lang) {}
 
     Column(modifier) {
-        Row(modifier = Modifier.weight(1f)) {
+        Row(
+            modifier = Modifier.weight(1f),
+        ) {
             SideBar(
                 filePairs = uiState.filePairs,
                 onOpenFilePair = {

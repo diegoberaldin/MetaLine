@@ -82,7 +82,7 @@ fun ProjectScreen(
                 .background(
                     color = SelectedBackground,
                     shape = RoundedCornerShape(
-                        topStart = 0.dp,
+                        topStart = if (currentPairIdx == 0) 0.dp else 4.dp,
                         topEnd = 4.dp,
                         bottomStart = 4.dp,
                         bottomEnd = 4.dp,
