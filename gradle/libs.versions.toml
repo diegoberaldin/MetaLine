@@ -3,8 +3,9 @@ androidx_datastore = "1.0.0"
 exposed = "0.41.1"
 h2 = "2.1.214"
 koin = "3.2.0"
-kotlinx_coroutines = "1.6.4"
+kotlinx_coroutines = "1.7.1"
 log4j = "2.20.0"
+decompose = "2.0.0-alpha-02"
 essenty = "1.1.0"
 redundent = "1.9.0"
 sl4j = "1.7.30"
@@ -18,6 +19,8 @@ koin = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin_test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 
 # Essenty
+decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
+decompose_extensions = { module = "com.arkivanov.decompose:extensions-compose-jetbrains", version.ref = "decompose" }
 essenty_instancekeeper = { module = "com.arkivanov.essenty:instance-keeper", version.ref = "essenty" }
 
 # AndroidX
@@ -38,7 +41,8 @@ log4j_core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "lo
 log4j_impl = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j" }
 sl4j_api = { module = "org.slf4j:slf4j-api", version.ref = "sl4j" }
 
-# tests
+# coroutines
+kotlinx_coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx_coroutines" }
 kotlinx_coroutines_test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx_coroutines" }
 
 [bundles]
