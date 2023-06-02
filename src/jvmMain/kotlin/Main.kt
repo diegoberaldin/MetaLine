@@ -1,9 +1,14 @@
 import align.di.alignModule
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.MenuBar
@@ -30,8 +35,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.runBlocking
 import main.di.mainModule
 import main.ui.MainScreen
+import main.ui.MainComponent
 import org.koin.core.context.GlobalContext.startKoin
-import org.koin.java.KoinJavaComponent.inject
 import persistence.di.persistenceModule
 import project.di.projectModule
 import projectcreate.ui.dialog.CreateProjectDialog
@@ -115,7 +120,13 @@ fun main() {
                 )
             }
             MetaLineTheme {
-                MainScreen()
+                Surface(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colors.background)) {
+                    val mainConfig by rootComponent.main.subscribeAsState()
+                    val mainComponent = mainConfig.child?.instance as? MainComponent
+                    if (mainComponent != null) {
+                        MainScreen(component = mainComponent)
+                    }
+                }
             }
 
             // dialogs
@@ -185,9 +196,8 @@ private fun MenuBarScope.makeMenus(
             text = "menu_project_new".localized(),
             shortcut = KeyShortcut(Key.N, meta = true),
         ) {
-            val vm = AppBusiness.instanceKeeper.getOrCreate {
-                val res: ProjectMetadataViewModel by inject(ProjectMetadataViewModel::class.java)
-                res
+            val vm: ProjectMetadataViewModel = AppBusiness.instanceKeeper.getOrCreate {
+                getByInjection()
             }
             vm.load(project = null)
             rootComponent.openDialog(RootComponent.DialogConfig.NewProject)

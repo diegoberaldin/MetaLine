@@ -1,11 +1,12 @@
 package main.ui
 
-import L10n
-import com.arkivanov.essenty.instancekeeper.InstanceKeeper
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.lifecycle.doOnCreate
+import com.arkivanov.essenty.lifecycle.doOnDestroy
+import com.arkivanov.essenty.lifecycle.doOnStart
+import common.coroutines.CoroutineDispatcherProvider
 import common.keystore.TemporaryKeyStore
 import common.notification.NotificationCenter
-import common.notification.NotificationCenter.Event.CurrentProjectEdited
-import common.notification.NotificationCenter.Event.OpenProject
 import data.FilePairModel
 import data.ProjectModel
 import data.SegmentModel
@@ -14,6 +15,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.getAndUpdate
@@ -25,62 +27,72 @@ import repository.ProjectRepository
 import repository.SegmentRepository
 import usecase.ExportTmxUseCase
 import java.io.File
+import kotlin.coroutines.CoroutineContext
 
-class MainViewModel(
-    private val dispatcherProvider: common.coroutines.CoroutineDispatcherProvider,
+internal class DefaultMainComponent(
+    componentContext: ComponentContext,
+    coroutineContext: CoroutineContext,
+    private val dispatcherProvider: CoroutineDispatcherProvider,
     private val keyStore: TemporaryKeyStore,
     private val projectRepository: ProjectRepository,
     private val filePairRepository: FilePairRepository,
     private val segmentRepository: SegmentRepository,
     private val exportTmxUseCase: ExportTmxUseCase,
     private val notificationCenter: NotificationCenter,
-) : InstanceKeeper.Instance {
+) : MainComponent, ComponentContext by componentContext {
 
-    private val viewModelScope = CoroutineScope(SupervisorJob())
+    private lateinit var viewModelScope: CoroutineScope
     private val project = MutableStateFlow<ProjectModel?>(null)
     private val filePairs = MutableStateFlow<List<FilePairModel>>(emptyList())
     private val openFilePairs = MutableStateFlow<List<FilePairModel>>(emptyList())
     private val currentFilePairIndex = MutableStateFlow<Int?>(null)
 
-    val uiState = combine(
-        project,
-        filePairs,
-        openFilePairs,
-        currentFilePairIndex,
-    ) { project, filePairs, openFilePairs, currentFilePairIndex ->
-        MainUiState(
-            project = project,
-            filePairs = filePairs,
-            openFilePairs = openFilePairs,
-            currentFilePairIndex = currentFilePairIndex,
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = MainUiState(),
-    )
+    override lateinit var uiState: StateFlow<MainUiState>
 
     init {
-        openLastProject()
+        with(lifecycle) {
+            doOnCreate {
+                viewModelScope = CoroutineScope(coroutineContext + SupervisorJob())
+                uiState = combine(
+                    project,
+                    filePairs,
+                    openFilePairs,
+                    currentFilePairIndex,
+                ) { project, filePairs, openFilePairs, currentFilePairIndex ->
+                    MainUiState(
+                        project = project,
+                        filePairs = filePairs,
+                        openFilePairs = openFilePairs,
+                        currentFilePairIndex = currentFilePairIndex,
+                    )
+                }.stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5_000),
+                    initialValue = MainUiState(),
+                )
+            }
+            doOnStart {
+                openLastProject()
 
-        viewModelScope.launch(dispatcherProvider.io) {
-            launch {
-                notificationCenter.events.filter { it is OpenProject }.collect {
-                    val id = (it as OpenProject).projectId
-                    openProject(id)
+                viewModelScope.launch(dispatcherProvider.io) {
+                    launch {
+                        notificationCenter.events.filter { it is NotificationCenter.Event.OpenProject }.collect {
+                            val id = (it as NotificationCenter.Event.OpenProject).projectId
+                            openProject(id)
+                        }
+                    }
+                    launch {
+                        notificationCenter.events.filter { it is NotificationCenter.Event.CurrentProjectEdited }.collect {
+                            // refresh project
+                            openLastProject()
+                        }
+                    }
                 }
             }
-            launch {
-                notificationCenter.events.filter { it is CurrentProjectEdited }.collect {
-                    // refresh project
-                    openLastProject()
-                }
+            doOnDestroy {
+                viewModelScope.cancel()
             }
         }
-    }
-
-    override fun onDestroy() {
-        viewModelScope.cancel()
     }
 
     private fun openLastProject() {
@@ -92,13 +104,13 @@ class MainViewModel(
         }
     }
 
-    fun openProject(model: ProjectModel) {
+    override fun openProject(model: ProjectModel) {
         viewModelScope.launch(dispatcherProvider.io) {
             openProject(model.id)
         }
     }
 
-    fun closeProject() {
+    override fun closeProject() {
         viewModelScope.launch(dispatcherProvider.io) {
             keyStore.save("lastOpenedProject", 0)
         }
@@ -116,7 +128,7 @@ class MainViewModel(
         currentFilePairIndex.value = null
     }
 
-    fun openFilePair(index: Int) {
+    override fun openFilePair(index: Int) {
         val filePair = filePairs.value[index]
         var newIndex = 0
         openFilePairs.getAndUpdate { oldList ->
@@ -132,11 +144,11 @@ class MainViewModel(
         currentFilePairIndex.value = newIndex
     }
 
-    fun selectFilePair(index: Int) {
+    override fun selectFilePair(index: Int) {
         currentFilePairIndex.value = index.takeIf { it >= 0 }
     }
 
-    fun closeFilePair(index: Int) {
+    override fun closeFilePair(index: Int) {
         openFilePairs.updateAndGet {
             val newList = it.filterIndexed { i, _ -> i != index }
             if (newList.isEmpty()) {
@@ -148,7 +160,7 @@ class MainViewModel(
         }
     }
 
-    fun exportTmx(path: String) {
+    override fun exportTmx(path: String) {
         val project = project.value ?: return
 
         viewModelScope.launch(dispatcherProvider.io) {

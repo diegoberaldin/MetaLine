@@ -19,28 +19,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
-import com.arkivanov.essenty.instancekeeper.getOrCreate
 import common.ui.theme.Spacing
-import common.utils.AppBusiness
 import localized
 import mainintro.ui.IntroScreen
-import org.koin.java.KoinJavaComponent.inject
 import project.ui.ChooseFilePairScreen
 import project.ui.ProjectScreen
 import project.ui.components.SideBar
 
 @Composable
-fun MainScreen() {
-    val viewModel = AppBusiness.instanceKeeper.getOrCreate {
-        val res: MainViewModel by inject(MainViewModel::class.java)
-        res
-    }
-
+fun MainScreen(
+    component: MainComponent,
+) {
     Column(
         modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colors.background),
     ) {
-        val uiState by viewModel.uiState.collectAsState()
+        val uiState by component.uiState.collectAsState()
         Spacer(modifier = Modifier.height(Spacing.s))
         val currentProject = uiState.project
 
@@ -51,6 +45,7 @@ fun MainScreen() {
         } else {
             ProjectContainer(
                 modifier = Modifier.fillMaxSize(),
+                component = component,
             )
         }
     }
@@ -59,12 +54,9 @@ fun MainScreen() {
 @Composable
 internal fun ProjectContainer(
     modifier: Modifier = Modifier,
+    component: MainComponent,
 ) {
-    val viewModel = AppBusiness.instanceKeeper.getOrCreate {
-        val res: MainViewModel by inject(MainViewModel::class.java)
-        res
-    }
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by component.uiState.collectAsState()
     val currentFilePairIndex = uiState.currentFilePairIndex
     val currentProject = uiState.project ?: return
 
@@ -78,7 +70,7 @@ internal fun ProjectContainer(
             SideBar(
                 filePairs = uiState.filePairs,
                 onOpenFilePair = {
-                    viewModel.openFilePair(index = it)
+                    component.openFilePair(index = it)
                 },
             )
 
@@ -90,7 +82,7 @@ internal fun ProjectContainer(
                         modifier = Modifier.weight(1f).fillMaxWidth(),
                         filePairs = uiState.filePairs,
                         onOpenFilePair = {
-                            viewModel.openFilePair(index = it)
+                            component.openFilePair(index = it)
                         },
                     )
                 } else {
@@ -100,10 +92,10 @@ internal fun ProjectContainer(
                         currentPairIdx = currentFilePairIndex,
                         openedFilePairs = uiState.openFilePairs,
                         onSelectFilePair = { index ->
-                            viewModel.selectFilePair(index = index)
+                            component.selectFilePair(index = index)
                         },
                         onCloseFilePair = { index ->
-                            viewModel.closeFilePair(index = index)
+                            component.closeFilePair(index = index)
                         },
                     )
                 }

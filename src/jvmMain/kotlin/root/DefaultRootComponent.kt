@@ -1,6 +1,7 @@
 package root
 
 import align.ui.AlignViewModel
+import androidx.compose.runtime.snapshotFlow
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.slot.ChildSlot
 import com.arkivanov.decompose.router.slot.SlotNavigation
@@ -10,7 +11,9 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.essenty.lifecycle.doOnCreate
 import com.arkivanov.essenty.lifecycle.doOnDestroy
+import com.arkivanov.essenty.lifecycle.doOnStart
 import common.utils.AppBusiness
+import common.utils.asFlow
 import common.utils.getByInjection
 import data.ProjectModel
 import kotlinx.coroutines.CoroutineScope
@@ -19,10 +22,14 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
-import main.ui.MainViewModel
+import kotlinx.coroutines.launch
+import main.ui.MainComponent
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class DefaultRootComponent(
@@ -32,7 +39,7 @@ internal class DefaultRootComponent(
 
     private lateinit var viewModelScope: CoroutineScope
     private val dialogNavigation = SlotNavigation<RootComponent.DialogConfig>()
-    private val mainViewModel: MainViewModel = AppBusiness.instanceKeeper.getOrCreate { getByInjection() }
+    private val mainNavigation = SlotNavigation<RootComponent.MainConfig>()
     private val alignViewModel: AlignViewModel = AppBusiness.instanceKeeper.getOrCreate { getByInjection() }
 
     override lateinit var currentProject: StateFlow<ProjectModel?>
@@ -44,18 +51,25 @@ internal class DefaultRootComponent(
     override val dialog: Value<ChildSlot<RootComponent.DialogConfig, *>> = childSlot(
         source = dialogNavigation,
         key = "DialogSlot",
-        childFactory = ::createDialogChild,
+        childFactory = { _, _ -> },
+    )
+    override val main: Value<ChildSlot<RootComponent.MainConfig, MainComponent>> = childSlot(
+        source = mainNavigation,
+        key = "MainSlot",
+        childFactory = { _, _ -> getByInjection(componentContext, coroutineContext) },
     )
 
     init {
         with(lifecycle) {
             doOnCreate {
                 viewModelScope = CoroutineScope(coroutineContext + SupervisorJob())
-                currentProject = mainViewModel.uiState.mapLatest { it.project }.stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.Eagerly,
-                    initialValue = null,
-                )
+                currentProject = main.asFlow<MainComponent>(true, Duration.INFINITE)
+                    .flatMapLatest { it?.uiState ?: snapshotFlow { null } }
+                    .mapLatest { it?.project }.stateIn(
+                        scope = viewModelScope,
+                        started = SharingStarted.Eagerly,
+                        initialValue = null,
+                    )
                 isEditing = alignViewModel.editUiState.mapLatest { it.isEditing }.stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.Eagerly,
@@ -67,15 +81,12 @@ internal class DefaultRootComponent(
                     initialValue = false,
                 )
             }
+            doOnStart {
+                mainNavigation.activate(RootComponent.MainConfig)
+            }
             doOnDestroy {
                 viewModelScope.cancel()
             }
-        }
-    }
-
-    private fun createDialogChild(config: RootComponent.DialogConfig, context: ComponentContext) {
-        return when (config) {
-            else -> Unit
         }
     }
 
@@ -88,15 +99,24 @@ internal class DefaultRootComponent(
     }
 
     override fun openProject(project: ProjectModel) {
-        mainViewModel.openProject(project)
+        viewModelScope.launch {
+            val mainComponent = main.asFlow<MainComponent>().first()
+            mainComponent?.openProject(project)
+        }
     }
 
     override fun closeProject() {
-        mainViewModel.closeProject()
+        viewModelScope.launch {
+            val mainComponent = main.asFlow<MainComponent>().first()
+            mainComponent?.closeProject()
+        }
     }
 
     override fun exportTmx(path: String) {
-        mainViewModel.exportTmx(path)
+        viewModelScope.launch {
+            val mainComponent = main.asFlow<MainComponent>().first()
+            mainComponent?.exportTmx(path)
+        }
     }
 
     override fun moveSegmentUp() {

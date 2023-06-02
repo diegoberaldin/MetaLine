@@ -13,6 +13,7 @@ interface RootComponent {
     val isEditing: StateFlow<Boolean>
     val needsSaving: StateFlow<Boolean>
     val dialog: Value<ChildSlot<DialogConfig, *>>
+    val main: Value<ChildSlot<MainConfig, *>>
 
     fun openDialog(type: DialogConfig)
     fun closeDialog()
@@ -29,6 +30,9 @@ interface RootComponent {
     fun toggleEditing()
     fun splitSegment()
     fun deleteSegment()
+
+    @Parcelize
+    object MainConfig : Parcelable
 
     sealed interface DialogConfig : Parcelable {
         @Parcelize
@@ -50,4 +54,3 @@ interface RootComponent {
         object Export : DialogConfig
     }
 }
-
