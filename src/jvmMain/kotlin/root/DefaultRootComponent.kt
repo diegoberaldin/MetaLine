@@ -1,6 +1,5 @@
 package root
 
-import align.ui.AlignViewModel
 import androidx.compose.runtime.snapshotFlow
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.slot.ChildSlot
@@ -8,11 +7,9 @@ import com.arkivanov.decompose.router.slot.SlotNavigation
 import com.arkivanov.decompose.router.slot.activate
 import com.arkivanov.decompose.router.slot.childSlot
 import com.arkivanov.decompose.value.Value
-import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.essenty.lifecycle.doOnCreate
 import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.essenty.lifecycle.doOnStart
-import common.utils.AppBusiness
 import common.utils.asFlow
 import common.utils.getByInjection
 import data.ProjectModel
@@ -40,7 +37,6 @@ internal class DefaultRootComponent(
     private lateinit var viewModelScope: CoroutineScope
     private val dialogNavigation = SlotNavigation<RootComponent.DialogConfig>()
     private val mainNavigation = SlotNavigation<RootComponent.MainConfig>()
-    private val alignViewModel: AlignViewModel = AppBusiness.instanceKeeper.getOrCreate { getByInjection() }
 
     override lateinit var currentProject: StateFlow<ProjectModel?>
 
@@ -50,12 +46,12 @@ internal class DefaultRootComponent(
 
     override val dialog: Value<ChildSlot<RootComponent.DialogConfig, *>> = childSlot(
         source = dialogNavigation,
-        key = "DialogSlot",
+        key = "RootDialogSlot",
         childFactory = { _, _ -> },
     )
     override val main: Value<ChildSlot<RootComponent.MainConfig, MainComponent>> = childSlot(
         source = mainNavigation,
-        key = "MainSlot",
+        key = "RootMainSlot",
         childFactory = { _, _ -> getByInjection(componentContext, coroutineContext) },
     )
 
@@ -65,21 +61,26 @@ internal class DefaultRootComponent(
                 viewModelScope = CoroutineScope(coroutineContext + SupervisorJob())
                 currentProject = main.asFlow<MainComponent>(true, Duration.INFINITE)
                     .flatMapLatest { it?.uiState ?: snapshotFlow { null } }
-                    .mapLatest { it?.project }.stateIn(
+                    .mapLatest { it?.project }
+                    .stateIn(
                         scope = viewModelScope,
                         started = SharingStarted.Eagerly,
                         initialValue = null,
                     )
-                isEditing = alignViewModel.editUiState.mapLatest { it.isEditing }.stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.Eagerly,
-                    initialValue = false,
-                )
-                needsSaving = alignViewModel.editUiState.mapLatest { it.needsSaving }.stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.Eagerly,
-                    initialValue = false,
-                )
+                isEditing = main.asFlow<MainComponent>(true, Duration.INFINITE)
+                    .flatMapLatest { it?.isEditing ?: snapshotFlow { false } }
+                    .stateIn(
+                        scope = viewModelScope,
+                        started = SharingStarted.Eagerly,
+                        initialValue = false,
+                    )
+                needsSaving = main.asFlow<MainComponent>(true, Duration.INFINITE)
+                    .flatMapLatest { it?.needsSaving ?: snapshotFlow { false } }
+                    .stateIn(
+                        scope = viewModelScope,
+                        started = SharingStarted.Eagerly,
+                        initialValue = false,
+                    )
             }
             doOnStart {
                 mainNavigation.activate(RootComponent.MainConfig)
@@ -120,42 +121,72 @@ internal class DefaultRootComponent(
     }
 
     override fun moveSegmentUp() {
-        alignViewModel.moveSegmentUp()
+        viewModelScope.launch {
+            val mainComponent = main.asFlow<MainComponent>().first()
+            mainComponent?.moveSegmentUp()
+        }
     }
 
     override fun moveSegmentDown() {
-        alignViewModel.moveSegmentDown()
+        viewModelScope.launch {
+            val mainComponent = main.asFlow<MainComponent>().first()
+            mainComponent?.moveSegmentDown()
+        }
     }
 
     override fun mergeWithPreviousSegment() {
-        alignViewModel.mergeWithPreviousSegment()
+        viewModelScope.launch {
+            val mainComponent = main.asFlow<MainComponent>().first()
+            mainComponent?.mergeWithPreviousSegment()
+        }
     }
 
     override fun mergeWithNextSegment() {
-        alignViewModel.mergeWithNextSegment()
+        viewModelScope.launch {
+            val mainComponent = main.asFlow<MainComponent>().first()
+            mainComponent?.mergeWithNextSegment()
+        }
     }
 
     override fun createSegmentBefore() {
-        alignViewModel.createSegmentBefore()
+        viewModelScope.launch {
+            val mainComponent = main.asFlow<MainComponent>().first()
+            mainComponent?.createSegmentBefore()
+        }
     }
 
     override fun createSegmentAfter() {
-        alignViewModel.createSegmentAfter()
+        viewModelScope.launch {
+            val mainComponent = main.asFlow<MainComponent>().first()
+            mainComponent?.createSegmentAfter()
+        }
     }
 
     override fun save() {
-        alignViewModel.save()
+        viewModelScope.launch {
+            val mainComponent = main.asFlow<MainComponent>().first()
+            mainComponent?.save()
+        }
     }
 
     override fun toggleEditing() {
-        alignViewModel.toggleEditing()
+        viewModelScope.launch {
+            val mainComponent = main.asFlow<MainComponent>().first()
+            mainComponent?.toggleEditing()
+        }
     }
 
     override fun splitSegment() {
-        alignViewModel.splitSegment()
+        viewModelScope.launch {
+            val mainComponent = main.asFlow<MainComponent>().first()
+            mainComponent?.splitSegment()
+        }
     }
 
     override fun deleteSegment() {
-        alignViewModel.deleteSegment()
+        viewModelScope.launch {
+            val mainComponent = main.asFlow<MainComponent>().first()
+            mainComponent?.deleteSegment()
+        }
     }
 }

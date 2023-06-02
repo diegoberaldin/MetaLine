@@ -1,7 +1,7 @@
 package project.ui
 
+import align.ui.AlignComponent
 import align.ui.AlignScreen
-import align.ui.AlignViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,18 +18,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.arkivanov.essenty.instancekeeper.getOrCreate
 import common.ui.components.CustomTabBar
 import common.ui.theme.SelectedBackground
 import common.ui.theme.Spacing
-import common.utils.AppBusiness
 import data.FilePairModel
 import data.ProjectModel
-import org.koin.java.KoinJavaComponent.inject
 import project.ui.components.MainToolbar
 
 @Composable
 fun ProjectScreen(
+    alignComponent: AlignComponent,
     project: ProjectModel,
     currentPairIdx: Int,
     openedFilePairs: List<FilePairModel>,
@@ -37,11 +35,7 @@ fun ProjectScreen(
     onSelectFilePair: ((Int) -> Unit)? = null,
     onCloseFilePair: ((Int) -> Unit)? = null,
 ) {
-    val alignViewModel = AppBusiness.instanceKeeper.getOrCreate {
-        val res: AlignViewModel by inject(AlignViewModel::class.java)
-        res
-    }
-    val alignUiState by alignViewModel.editUiState.collectAsState()
+    val alignUiState by alignComponent.editUiState.collectAsState()
 
     Column(
         modifier = modifier,
@@ -50,16 +44,16 @@ fun ProjectScreen(
             isEditing = alignUiState.isEditing,
             needsSaving = alignUiState.needsSaving,
             modifier = Modifier.fillMaxWidth(),
-            onSave = { alignViewModel.save() },
-            onMoveUp = { alignViewModel.moveSegmentUp() },
-            onMoveDown = { alignViewModel.moveSegmentDown() },
-            onNewBefore = { alignViewModel.createSegmentBefore() },
-            onNewAfter = { alignViewModel.createSegmentAfter() },
-            onMergePrevious = { alignViewModel.mergeWithPreviousSegment() },
-            onMergeNext = { alignViewModel.mergeWithNextSegment() },
-            onDelete = { alignViewModel.deleteSegment() },
-            onEdit = { alignViewModel.toggleEditing() },
-            onSplit = { alignViewModel.splitSegment() },
+            onSave = { alignComponent.save() },
+            onMoveUp = { alignComponent.moveSegmentUp() },
+            onMoveDown = { alignComponent.moveSegmentDown() },
+            onNewBefore = { alignComponent.createSegmentBefore() },
+            onNewAfter = { alignComponent.createSegmentAfter() },
+            onMergePrevious = { alignComponent.mergeWithPreviousSegment() },
+            onMergeNext = { alignComponent.mergeWithNextSegment() },
+            onDelete = { alignComponent.deleteSegment() },
+            onEdit = { alignComponent.toggleEditing() },
+            onSplit = { alignComponent.splitSegment() },
         )
 
         Spacer(modifier = Modifier.height(Spacing.xs))
@@ -92,9 +86,11 @@ fun ProjectScreen(
         ) {
             val current = openedFilePairs.getOrNull(currentPairIdx)
             LaunchedEffect(current) {
-                alignViewModel.load(pair = current, project = project)
+                alignComponent.load(pair = current, project = project)
             }
-            AlignScreen()
+            AlignScreen(
+                component = alignComponent
+            )
         }
     }
 }

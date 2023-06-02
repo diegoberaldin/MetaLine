@@ -1,13 +1,15 @@
 package align.di
 
-import align.ui.AlignViewModel
+import align.ui.AlignComponent
+import align.ui.DefaultAlignComponent
 import org.koin.dsl.module
 
 val alignModule = module {
-    factory {
-        AlignViewModel(
+    factory<AlignComponent> {
+        DefaultAlignComponent(
+            componentContext = it[0],
+            coroutineContext = it[1],
             dispatcherProvider = get(),
-            logManager = get(),
             segmentRepository = get(),
         )
     }

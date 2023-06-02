@@ -1,7 +1,8 @@
 package align.ui
 
-import com.arkivanov.essenty.instancekeeper.InstanceKeeper
-import common.log.LogManager
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.lifecycle.doOnCreate
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 import data.FilePairModel
 import data.ProjectModel
 import data.SegmentModel
@@ -10,21 +11,24 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import repository.SegmentRepository
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 
-class AlignViewModel(
+internal class DefaultAlignComponent(
+    componentContext: ComponentContext,
+    coroutineContext: CoroutineContext,
     private val dispatcherProvider: common.coroutines.CoroutineDispatcherProvider,
-    private val logManager: LogManager,
     private val segmentRepository: SegmentRepository,
-) : InstanceKeeper.Instance {
+) : AlignComponent, ComponentContext by componentContext {
 
-    private val viewModelScope = CoroutineScope(SupervisorJob())
+    private lateinit var viewModelScope: CoroutineScope
     private val sourceSegments = MutableStateFlow<List<SegmentModel>>(emptyList())
     private val targetSegments = MutableStateFlow<List<SegmentModel>>(emptyList())
     private val selectedSourceId = MutableStateFlow<Int?>(null)
@@ -36,43 +40,51 @@ class AlignViewModel(
     private var sourceLang = ""
     private var targetLang = ""
 
-    val uiState = combine(
-        sourceSegments,
-        targetSegments,
-        selectedSourceId,
-        selectedTargetId,
-    ) { sourceSegments, targetSegments, sourceId, targetId ->
-        AlignUiState(
-            sourceSegments = sourceSegments,
-            targetSegments = targetSegments,
-            selectedSourceId = sourceId,
-            selectedTargetId = targetId,
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = AlignUiState(),
-    )
+    override lateinit var uiState: StateFlow<AlignUiState>
+    override lateinit var editUiState: StateFlow<AlignEditUiState>
 
-    val editUiState = combine(
-        isEditing,
-        needsSaving,
-    ) { isEditing, needsSaving ->
-        AlignEditUiState(
-            isEditing = isEditing,
-            needsSaving = needsSaving,
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = AlignEditUiState(),
-    )
-
-    override fun onDestroy() {
-        viewModelScope.cancel()
+    init {
+        with(lifecycle) {
+            doOnCreate {
+                viewModelScope = CoroutineScope(coroutineContext + SupervisorJob())
+                uiState = combine(
+                    sourceSegments,
+                    targetSegments,
+                    selectedSourceId,
+                    selectedTargetId,
+                ) { sourceSegments, targetSegments, sourceId, targetId ->
+                    AlignUiState(
+                        sourceSegments = sourceSegments,
+                        targetSegments = targetSegments,
+                        selectedSourceId = sourceId,
+                        selectedTargetId = targetId,
+                    )
+                }.stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5_000),
+                    initialValue = AlignUiState(),
+                )
+                editUiState = combine(
+                    isEditing,
+                    needsSaving,
+                ) { isEditing, needsSaving ->
+                    AlignEditUiState(
+                        isEditing = isEditing,
+                        needsSaving = needsSaving,
+                    )
+                }.stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5_000),
+                    initialValue = AlignEditUiState(),
+                )
+            }
+            doOnDestroy {
+                viewModelScope.cancel()
+            }
+        }
     }
 
-    fun load(pair: FilePairModel?, project: ProjectModel) {
+    override fun load(pair: FilePairModel?, project: ProjectModel) {
         pairId = pair?.id ?: 0
         sourceLang = project.sourceLang
         targetLang = project.targetLang
@@ -89,7 +101,7 @@ class AlignViewModel(
 
     // Selection
 
-    fun selectSourceSegment(id: Int) {
+    override fun selectSourceSegment(id: Int) {
         if (isEditing.value) {
             toggleEditing()
         }
@@ -103,7 +115,7 @@ class AlignViewModel(
         selectedTargetId.value = null
     }
 
-    fun selectTargetSegment(id: Int) {
+    override fun selectTargetSegment(id: Int) {
         if (isEditing.value) {
             toggleEditing()
         }
@@ -119,7 +131,7 @@ class AlignViewModel(
 
     // Reordering
 
-    fun moveSegmentUp() {
+    override fun moveSegmentUp() {
         val sourceSelectedIdx = sourceSegments.value.indexOfFirst { it.id == selectedSourceId.value }
         val targetSelectedIdx = targetSegments.value.indexOfFirst { it.id == selectedTargetId.value }
         when {
@@ -143,7 +155,7 @@ class AlignViewModel(
         }
     }
 
-    fun moveSegmentDown() {
+    override fun moveSegmentDown() {
         val sourceSelectedIdx = sourceSegments.value.indexOfFirst { it.id == selectedSourceId.value }
         val targetSelectedIdx = targetSegments.value.indexOfFirst { it.id == selectedTargetId.value }
         when {
@@ -228,7 +240,7 @@ class AlignViewModel(
         save()
     }
 
-    fun mergeWithPreviousSegment() {
+    override fun mergeWithPreviousSegment() {
         if (isEditing.value) {
             toggleEditing()
         }
@@ -287,7 +299,7 @@ class AlignViewModel(
         }
     }
 
-    fun mergeWithNextSegment() {
+    override fun mergeWithNextSegment() {
         if (isEditing.value) {
             toggleEditing()
         }
@@ -344,9 +356,9 @@ class AlignViewModel(
         }
     }
 
-// Creation and deletion
+    // Creation and deletion
 
-    fun createSegmentBefore() {
+    override fun createSegmentBefore() {
         if (isEditing.value) {
             toggleEditing()
         }
@@ -385,7 +397,7 @@ class AlignViewModel(
         }
     }
 
-    fun createSegmentAfter() {
+    override fun createSegmentAfter() {
         if (isEditing.value) {
             toggleEditing()
         }
@@ -424,7 +436,7 @@ class AlignViewModel(
         }
     }
 
-    fun deleteSegment() {
+    override fun deleteSegment() {
         val sourceSelectedIdx = sourceSegments.value.indexOfFirst { it.id == selectedSourceId.value }
         val targetSelectedIdx = targetSegments.value.indexOfFirst { it.id == selectedTargetId.value }
         when {
@@ -464,7 +476,7 @@ class AlignViewModel(
 
 // Editing
 
-    fun toggleEditing() {
+    override fun toggleEditing() {
         val sourceSelectedIdx = sourceSegments.value.indexOfFirst { it.id == selectedSourceId.value }
         val targetSelectedIdx = targetSegments.value.indexOfFirst { it.id == selectedTargetId.value }
         if (sourceSelectedIdx < 0 && targetSelectedIdx < 0) {
@@ -497,7 +509,7 @@ class AlignViewModel(
         }
     }
 
-    fun editSegment(id: Int, value: String, position: Int) {
+    override fun editSegment(id: Int, value: String, position: Int) {
         if (!isEditing.value) {
             return
         }
@@ -532,7 +544,7 @@ class AlignViewModel(
         }
     }
 
-    fun splitSegment() {
+    override fun splitSegment() {
         if (!isEditing.value) {
             return
         }
@@ -601,7 +613,7 @@ class AlignViewModel(
         }
     }
 
-    fun save() {
+    override fun save() {
         viewModelScope.launch(dispatcherProvider.io) {
             sourceSegments.getAndUpdate { oldList ->
                 val newList = oldList.mapIndexed { idx, it -> it.copy(position = idx) }
