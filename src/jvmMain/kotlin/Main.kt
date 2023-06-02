@@ -20,28 +20,27 @@ import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.lifecycle.LifecycleController
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
-import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import common.di.commonModule
 import common.keystore.TemporaryKeyStore
 import common.log.LogManager
 import common.ui.components.CustomSaveFileDialog
 import common.ui.theme.MetaLineTheme
-import common.utils.AppBusiness
 import common.utils.getByInjection
 import common.utils.runOnUiThread
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.runBlocking
 import main.di.mainModule
-import main.ui.MainScreen
 import main.ui.MainComponent
+import main.ui.MainScreen
 import org.koin.core.context.GlobalContext.startKoin
 import persistence.di.persistenceModule
 import project.di.projectModule
+import projectcreate.ui.dialog.CreateProjectComponent
 import projectcreate.ui.dialog.CreateProjectDialog
+import projectedit.ui.dialog.EditProjectComponent
 import projectedit.ui.dialog.EditProjectDialog
-import projectmetadata.ui.ProjectMetadataViewModel
 import projectsettings.ui.dialog.SettingsDialog
 import projectstatistics.ui.dialog.StatisticsDialog
 import repository.repositoryModule
@@ -134,6 +133,7 @@ fun main() {
             val currentProject by rootComponent.currentProject.collectAsState()
             when (dialogState.child?.configuration) {
                 RootComponent.DialogConfig.NewProject -> CreateProjectDialog(
+                    component = dialogState.child?.instance as CreateProjectComponent,
                     onClose = { project ->
                         rootComponent.closeDialog()
                         if (project != null) {
@@ -143,6 +143,7 @@ fun main() {
                 )
 
                 RootComponent.DialogConfig.EditProject -> EditProjectDialog(
+                    component = dialogState.child?.instance as EditProjectComponent,
                     project = currentProject,
                     onClose = {
                         rootComponent.closeDialog()
@@ -196,10 +197,6 @@ private fun MenuBarScope.makeMenus(
             text = "menu_project_new".localized(),
             shortcut = KeyShortcut(Key.N, meta = true),
         ) {
-            val vm: ProjectMetadataViewModel = AppBusiness.instanceKeeper.getOrCreate {
-                getByInjection()
-            }
-            vm.load(project = null)
             rootComponent.openDialog(RootComponent.DialogConfig.NewProject)
         }
         Item(

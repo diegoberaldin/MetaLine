@@ -10,6 +10,7 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.doOnCreate
 import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.essenty.lifecycle.doOnStart
+import common.coroutines.CoroutineDispatcherProvider
 import common.utils.asFlow
 import common.utils.getByInjection
 import data.ProjectModel
@@ -25,6 +26,8 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import main.ui.MainComponent
+import projectcreate.ui.dialog.CreateProjectComponent
+import projectedit.ui.dialog.EditProjectComponent
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 
@@ -32,6 +35,7 @@ import kotlin.time.Duration
 internal class DefaultRootComponent(
     componentContext: ComponentContext,
     coroutineContext: CoroutineContext,
+    private val dispatcherProvider: CoroutineDispatcherProvider,
 ) : RootComponent, ComponentContext by componentContext {
 
     private lateinit var viewModelScope: CoroutineScope
@@ -47,7 +51,19 @@ internal class DefaultRootComponent(
     override val dialog: Value<ChildSlot<RootComponent.DialogConfig, *>> = childSlot(
         source = dialogNavigation,
         key = "RootDialogSlot",
-        childFactory = { _, _ -> },
+        childFactory = { config, context ->
+            when (config) {
+                RootComponent.DialogConfig.NewProject -> {
+                    getByInjection<CreateProjectComponent>(context, coroutineContext)
+                }
+
+                RootComponent.DialogConfig.EditProject -> {
+                    getByInjection<EditProjectComponent>(context, coroutineContext)
+                }
+
+                else -> Unit
+            }
+        },
     )
     override val main: Value<ChildSlot<RootComponent.MainConfig, MainComponent>> = childSlot(
         source = mainNavigation,
@@ -92,11 +108,15 @@ internal class DefaultRootComponent(
     }
 
     override fun openDialog(type: RootComponent.DialogConfig) {
-        dialogNavigation.activate(type)
+        viewModelScope.launch(dispatcherProvider.main) {
+            dialogNavigation.activate(type)
+        }
     }
 
     override fun closeDialog() {
-        dialogNavigation.activate(RootComponent.DialogConfig.None)
+        viewModelScope.launch(dispatcherProvider.main) {
+            dialogNavigation.activate(RootComponent.DialogConfig.None)
+        }
     }
 
     override fun openProject(project: ProjectModel) {

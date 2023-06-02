@@ -8,6 +8,7 @@ val rootModule = module {
         DefaultRootComponent(
             componentContext = it[0],
             coroutineContext = it[1],
+            dispatcherProvider = get(),
         )
     }
 }
