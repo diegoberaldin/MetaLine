@@ -28,24 +28,18 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.rememberWindowState
-import com.arkivanov.essenty.instancekeeper.getOrCreate
 import common.ui.components.CustomProgressIndicator
 import common.ui.theme.MetaLineTheme
 import common.ui.theme.Spacing
-import common.utils.AppBusiness
 import data.ProjectModel
 import localized
-import org.koin.java.KoinJavaComponent.inject
 
 @Composable
 fun StatisticsDialog(
+    component: StatisticsComponent,
     project: ProjectModel,
     onClose: () -> Unit,
 ) {
-    val viewModel: StatisticsViewModel = AppBusiness.instanceKeeper.getOrCreate {
-        val res: StatisticsViewModel by inject(StatisticsViewModel::class.java)
-        res
-    }
     MetaLineTheme {
         Window(
             title = "dialog_title_statistics".localized(),
@@ -56,10 +50,10 @@ fun StatisticsDialog(
             },
         ) {
             LaunchedEffect(project) {
-                viewModel.load(project)
+                component.load(project)
             }
 
-            val uiState by viewModel.uiState.collectAsState()
+            val uiState by component.uiState.collectAsState()
 
             Column(
                 modifier = Modifier.size(600.dp, 400.dp)

@@ -1,5 +1,6 @@
 package mainintro.ui
 
+import L10n
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,26 +29,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.arkivanov.essenty.instancekeeper.getOrCreate
 import common.ui.theme.SelectedBackground
 import common.ui.theme.Spacing
-import common.utils.AppBusiness
 import localized
-import org.koin.java.KoinJavaComponent
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun IntroScreen(
+    component: IntroComponent,
     modifier: Modifier = Modifier,
 ) {
     val lang by L10n.currentLanguage.collectAsState("lang".localized())
     LaunchedEffect(lang) {}
 
-    val viewModel = AppBusiness.instanceKeeper.getOrCreate {
-        val res: IntroViewModel by KoinJavaComponent.inject(IntroViewModel::class.java)
-        res
-    }
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by component.uiState.collectAsState()
     Column(
         modifier = modifier.padding(horizontal = Spacing.s),
     ) {
@@ -89,7 +84,7 @@ fun IntroScreen(
                         .fillMaxWidth()
                         .background(color = SelectedBackground, shape = RoundedCornerShape(4.dp))
                         .padding(Spacing.m).onClick {
-                            viewModel.open(project)
+                            component.open(project)
                         },
                     horizontalArrangement = Arrangement.spacedBy(Spacing.m),
                     verticalAlignment = Alignment.CenterVertically,
@@ -107,7 +102,7 @@ fun IntroScreen(
                     Spacer(modifier = Modifier.weight(1f))
                     Icon(
                         modifier = Modifier.onClick {
-                            viewModel.delete(project)
+                            component.delete(project)
                         },
                         imageVector = Icons.Default.Delete,
                         contentDescription = null,

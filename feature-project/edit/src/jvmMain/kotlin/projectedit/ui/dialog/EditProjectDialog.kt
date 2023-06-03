@@ -24,44 +24,43 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.rememberWindowState
-import com.arkivanov.essenty.instancekeeper.getOrCreate
+import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import common.ui.components.CustomTabBar
 import common.ui.theme.MetaLineTheme
 import common.ui.theme.SelectedBackground
 import common.ui.theme.Spacing
-import common.utils.AppBusiness
 import data.ProjectModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import localized
-import org.koin.java.KoinJavaComponent.inject
+import projectmetadata.ui.ProjectMetadataComponent
 import projectmetadata.ui.ProjectMetadataScreen
-import projectmetadata.ui.ProjectMetadataViewModel
+import projectsegmentation.ui.ProjectSegmentationComponent
 import projectsegmentation.ui.ProjectSegmentationScreen
 
 @Composable
 fun EditProjectDialog(
+    component: EditProjectComponent,
     project: ProjectModel? = null,
     onClose: ((ProjectModel?) -> Unit)? = null,
 ) {
-    val viewModel: EditProjectViewModel = AppBusiness.instanceKeeper.getOrCreate {
-        val res: EditProjectViewModel by inject(EditProjectViewModel::class.java)
-        res
-    }
-    val metadataViewModel: ProjectMetadataViewModel = AppBusiness.instanceKeeper.getOrCreate {
-        val res: ProjectMetadataViewModel by inject(ProjectMetadataViewModel::class.java)
-        res
-    }
-    LaunchedEffect(project) {
-        metadataViewModel.load(project = project)
-    }
-    LaunchedEffect(viewModel) {
+    LaunchedEffect(component) {
+        component.project = project
         launch {
-            metadataViewModel.onDone.collect {
+            component.onDone.collect {
                 onClose?.invoke(null)
             }
         }
     }
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by component.uiState.collectAsState()
+    val content by component.content.subscribeAsState()
+
+    LaunchedEffect(component) {
+        component.onDone.onEach {
+            onClose?.invoke(it)
+        }.launchIn(this)
+    }
 
     MetaLineTheme {
         Window(
@@ -85,7 +84,7 @@ fun EditProjectDialog(
                     tabs = tabs.map { it.toReadableName() },
                     current = tabIndex,
                     onTabSelected = {
-                        viewModel.selectTab(tabs[it])
+                        component.selectTab(tabs[it])
                     },
                 )
                 val bottomModifier = Modifier.fillMaxWidth()
@@ -97,13 +96,19 @@ fun EditProjectDialog(
                             else -> RoundedCornerShape(4.dp)
                         },
                     ).padding(horizontal = Spacing.s)
-                when (uiState.currentTab) {
-                    EditProjectSection.SEGMENTATION_RULES -> ProjectSegmentationScreen(
+                when (content.child?.configuration) {
+                    EditProjectComponent.Config.SegmentationRules -> ProjectSegmentationScreen(
+                        component = content.child?.instance as ProjectSegmentationComponent,
                         modifier = bottomModifier,
                         project = project,
                     )
 
-                    else -> ProjectMetadataScreen(modifier = bottomModifier)
+                    EditProjectComponent.Config.Metadata -> ProjectMetadataScreen(
+                        component = content.child?.instance as ProjectMetadataComponent,
+                        modifier = bottomModifier,
+                    )
+
+                    else -> Unit
                 }
                 Row(
                     modifier = Modifier.padding(Spacing.s),
@@ -123,7 +128,7 @@ fun EditProjectDialog(
                         modifier = Modifier.heightIn(max = 25.dp),
                         contentPadding = PaddingValues(0.dp),
                         onClick = {
-                            metadataViewModel.submit()
+                            component.submitMetadata()
                         },
                     ) {
                         Text(text = "button_ok".localized(), style = MaterialTheme.typography.button)

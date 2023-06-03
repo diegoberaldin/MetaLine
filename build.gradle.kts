@@ -26,7 +26,8 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.animation)
 
-                implementation(libs.essenty.instancekeeper)
+                implementation(libs.decompose)
+                implementation(libs.decompose.extensions)
                 implementation(libs.koin)
 
                 implementation(projects.coreCommon)
@@ -52,7 +53,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "MetaLineKt"
+        mainClass = "MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "MetaLine"

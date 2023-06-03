@@ -1,6 +1,8 @@
 package projectmetadata.ui
 
-import com.arkivanov.essenty.instancekeeper.InstanceKeeper
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.lifecycle.doOnCreate
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 import common.coroutines.CoroutineDispatcherProvider
 import common.notification.NotificationCenter
 import data.FilePairModel
@@ -12,7 +14,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.map
@@ -25,8 +27,11 @@ import repository.ProjectRepository
 import repository.SegmentRepository
 import usecase.GetCompleteLanguageUseCase
 import usecase.SegmentTxtFileUseCase
+import kotlin.coroutines.CoroutineContext
 
-class ProjectMetadataViewModel(
+internal class DefaultProjectMetadataComponent(
+    componentContext: ComponentContext,
+    coroutineContext: CoroutineContext,
     private val dispatcherProvider: CoroutineDispatcherProvider,
     private val languageRepository: LanguageRepository,
     private val segmentUseCase: SegmentTxtFileUseCase,
@@ -35,7 +40,7 @@ class ProjectMetadataViewModel(
     private val segmentRepository: SegmentRepository,
     private val completeLanguage: GetCompleteLanguageUseCase,
     private val notificationCenter: NotificationCenter,
-) : InstanceKeeper.Instance {
+) : ProjectMetadataComponent, ComponentContext by componentContext {
 
     private val name = MutableStateFlow("")
     private val sourceLanguage = MutableStateFlow<LanguageModel?>(null)
@@ -49,82 +54,89 @@ class ProjectMetadataViewModel(
     private val nameError = MutableStateFlow("")
     private val languagesError = MutableStateFlow("")
     private val filesError = MutableStateFlow("")
-    private val viewModelScope = CoroutineScope(SupervisorJob())
-    private val _onDone = MutableSharedFlow<ProjectModel>()
-    val onDone = _onDone.asSharedFlow()
+    private lateinit var viewModelScope: CoroutineScope
     private var projectId = 0
 
     private val defaultLanguages: List<LanguageModel> = languageRepository.getDefaultLanguages().map {
         completeLanguage(it)
     }
 
-    val uiState = name.map { name ->
-        ProjectMetadataUiState(
-            name = name,
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = ProjectMetadataUiState(),
-    )
+    override val onDone = MutableSharedFlow<ProjectModel>()
+    override lateinit var uiState: StateFlow<ProjectMetadataUiState>
+    override lateinit var languagesUiState: StateFlow<ProjectMetadataLanguagesUiState>
+    override lateinit var fileUiState: StateFlow<ProjectMetadataFileUiState>
+    override lateinit var errorUiState: StateFlow<CreateProjectErrorState>
 
-    val languagesUiState = combine(
-        sourceLanguage,
-        targetLanguage,
-        availableSourceLanguages,
-        availableTargetLanguages,
-    ) { sourceLanguage, targetLanguage, availableSourceLanguages, availableTargetLanguages ->
-        ProjectMetadataLanguagesUiState(
-            sourceLanguage = sourceLanguage,
-            targetLanguage = targetLanguage,
-            availableSourceLanguages = availableSourceLanguages,
-            availableTargetLanguages = availableTargetLanguages,
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = ProjectMetadataLanguagesUiState(),
-    )
-
-    val fileUiState = combine(
-        sourceFiles,
-        targetFiles,
-        selectedSource,
-        selectedTarget,
-    ) { sourceFiles, targetFiles, selectedSource, selectedTarget ->
-        ProjectMetadataFileUiState(
-            sourceFiles = sourceFiles,
-            targetFiles = targetFiles,
-            selectedSource = selectedSource,
-            selectedTarget = selectedTarget,
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = ProjectMetadataFileUiState(),
-    )
-
-    val errorUiState = combine(
-        nameError,
-        languagesError,
-        filesError,
-    ) { nameError, languagesError, filesError ->
-        CreateProjectErrorState(
-            nameError = nameError,
-            languagesError = languagesError,
-            filesError = filesError,
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = CreateProjectErrorState(),
-    )
-
-    override fun onDestroy() {
-        viewModelScope.cancel()
+    init {
+        with(lifecycle) {
+            doOnCreate {
+                viewModelScope = CoroutineScope(coroutineContext + SupervisorJob())
+                uiState = name.map { name ->
+                    ProjectMetadataUiState(
+                        name = name,
+                    )
+                }.stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5_000),
+                    initialValue = ProjectMetadataUiState(),
+                )
+                languagesUiState = combine(
+                    sourceLanguage,
+                    targetLanguage,
+                    availableSourceLanguages,
+                    availableTargetLanguages,
+                ) { sourceLanguage, targetLanguage, availableSourceLanguages, availableTargetLanguages ->
+                    ProjectMetadataLanguagesUiState(
+                        sourceLanguage = sourceLanguage,
+                        targetLanguage = targetLanguage,
+                        availableSourceLanguages = availableSourceLanguages,
+                        availableTargetLanguages = availableTargetLanguages,
+                    )
+                }.stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5_000),
+                    initialValue = ProjectMetadataLanguagesUiState(),
+                )
+                fileUiState = combine(
+                    sourceFiles,
+                    targetFiles,
+                    selectedSource,
+                    selectedTarget,
+                ) { sourceFiles, targetFiles, selectedSource, selectedTarget ->
+                    ProjectMetadataFileUiState(
+                        sourceFiles = sourceFiles,
+                        targetFiles = targetFiles,
+                        selectedSource = selectedSource,
+                        selectedTarget = selectedTarget,
+                    )
+                }.stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5_000),
+                    initialValue = ProjectMetadataFileUiState(),
+                )
+                errorUiState = combine(
+                    nameError,
+                    languagesError,
+                    filesError,
+                ) { nameError, languagesError, filesError ->
+                    CreateProjectErrorState(
+                        nameError = nameError,
+                        languagesError = languagesError,
+                        filesError = filesError,
+                    )
+                }.stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5_000),
+                    initialValue = CreateProjectErrorState(),
+                )
+            }
+            doOnDestroy {
+                viewModelScope.cancel()
+            }
+        }
     }
 
-    fun load(project: ProjectModel?) {
+    override fun load(project: ProjectModel?) {
         name.value = project?.name ?: ""
         sourceLanguage.value = defaultLanguages.find { it.code == project?.sourceLang }
         targetLanguage.value = defaultLanguages.find { it.code == project?.targetLang }
@@ -148,11 +160,11 @@ class ProjectMetadataViewModel(
         }
     }
 
-    fun setName(value: String) {
+    override fun setName(value: String) {
         name.value = value
     }
 
-    fun setSourceLanguage(value: LanguageModel) {
+    override fun setSourceLanguage(value: LanguageModel) {
         if (value.code.isEmpty()) {
             sourceLanguage.value = null
         } else {
@@ -161,7 +173,7 @@ class ProjectMetadataViewModel(
         refreshAvailableLanguages()
     }
 
-    fun setTargetLanguage(value: LanguageModel) {
+    override fun setTargetLanguage(value: LanguageModel) {
         if (value.code.isEmpty()) {
             targetLanguage.value = null
         } else {
@@ -170,7 +182,7 @@ class ProjectMetadataViewModel(
         refreshAvailableLanguages()
     }
 
-    fun selectSourceFile(value: Int) {
+    override fun selectSourceFile(value: Int) {
         selectedSource.getAndUpdate { oldIdx ->
             if (oldIdx == value) {
                 null
@@ -180,7 +192,7 @@ class ProjectMetadataViewModel(
         }
     }
 
-    fun selectTargetFile(value: Int) {
+    override fun selectTargetFile(value: Int) {
         selectedTarget.getAndUpdate { oldIdx ->
             if (oldIdx == value) {
                 null
@@ -190,7 +202,7 @@ class ProjectMetadataViewModel(
         }
     }
 
-    fun addSourceFile(path: String) {
+    override fun addSourceFile(path: String) {
         sourceFiles.getAndUpdate { oldList ->
             if (oldList.contains(path)) {
                 oldList
@@ -200,7 +212,7 @@ class ProjectMetadataViewModel(
         }
     }
 
-    fun addTargetFile(path: String) {
+    override fun addTargetFile(path: String) {
         targetFiles.getAndUpdate { oldList ->
             if (oldList.contains(path)) {
                 oldList
@@ -210,7 +222,7 @@ class ProjectMetadataViewModel(
         }
     }
 
-    fun moveSourceUp() {
+    override fun moveSourceUp() {
         val index = selectedSource.value?.takeIf { it > 0 } ?: return
         sourceFiles.getAndUpdate { oldList ->
             val newList = oldList.toMutableList()
@@ -226,7 +238,7 @@ class ProjectMetadataViewModel(
         }
     }
 
-    fun moveSourceDown() {
+    override fun moveSourceDown() {
         val index = selectedSource.value?.takeIf { it < sourceFiles.value.size - 1 } ?: return
         sourceFiles.getAndUpdate { oldList ->
             val newList = oldList.toMutableList()
@@ -242,7 +254,7 @@ class ProjectMetadataViewModel(
         }
     }
 
-    fun moveTargetUp() {
+    override fun moveTargetUp() {
         val index = selectedTarget.value?.takeIf { it > 0 } ?: return
         targetFiles.getAndUpdate { oldList ->
             val newList = oldList.toMutableList()
@@ -258,7 +270,7 @@ class ProjectMetadataViewModel(
         }
     }
 
-    fun moveTargetDown() {
+    override fun moveTargetDown() {
         val index = selectedTarget.value?.takeIf { it < targetFiles.value.size - 1 } ?: return
         targetFiles.getAndUpdate { oldList ->
             val newList = oldList.toMutableList()
@@ -274,7 +286,7 @@ class ProjectMetadataViewModel(
         }
     }
 
-    fun deleteSourceFile() {
+    override fun deleteSourceFile() {
         val index = selectedSource.value ?: return
         selectedSource.value = null
         sourceFiles.getAndUpdate { oldList ->
@@ -284,7 +296,7 @@ class ProjectMetadataViewModel(
         }
     }
 
-    fun deleteTargetFile() {
+    override fun deleteTargetFile() {
         val index = selectedTarget.value ?: return
         selectedTarget.value = null
         targetFiles.getAndUpdate { oldList ->
@@ -294,7 +306,7 @@ class ProjectMetadataViewModel(
         }
     }
 
-    fun submit() {
+    override fun submit() {
         val name = name.value
         val sourceLang = sourceLanguage.value?.code.orEmpty()
         val targetLang = targetLanguage.value?.code.orEmpty()
@@ -387,7 +399,7 @@ class ProjectMetadataViewModel(
                 // existing project, current
                 notificationCenter.send(NotificationCenter.Event.CurrentProjectEdited)
             }
-            _onDone.emit(project.copy(id = projectId))
+            onDone.emit(project.copy(id = projectId))
         }
     }
 }

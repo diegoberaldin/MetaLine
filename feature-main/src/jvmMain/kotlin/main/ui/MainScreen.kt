@@ -1,6 +1,7 @@
 package main.ui
 
 import L10n
+import align.ui.AlignComponent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,39 +20,44 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
-import com.arkivanov.essenty.instancekeeper.getOrCreate
+import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import common.ui.theme.Spacing
-import common.utils.AppBusiness
 import localized
+import mainintro.ui.IntroComponent
 import mainintro.ui.IntroScreen
-import org.koin.java.KoinJavaComponent.inject
 import project.ui.ChooseFilePairScreen
 import project.ui.ProjectScreen
 import project.ui.components.SideBar
 
 @Composable
-fun MainScreen() {
-    val viewModel = AppBusiness.instanceKeeper.getOrCreate {
-        val res: MainViewModel by inject(MainViewModel::class.java)
-        res
-    }
-
+fun MainScreen(
+    component: MainComponent,
+) {
     Column(
         modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colors.background),
     ) {
-        val uiState by viewModel.uiState.collectAsState()
         Spacer(modifier = Modifier.height(Spacing.s))
-        val currentProject = uiState.project
 
-        if (currentProject == null) {
-            IntroScreen(
-                modifier = Modifier.fillMaxSize(),
-            )
-        } else {
-            ProjectContainer(
-                modifier = Modifier.fillMaxSize(),
-            )
+        val main by component.main.subscribeAsState()
+        when (main.child?.configuration) {
+            MainComponent.MainConfig.Intro -> {
+                IntroScreen(
+                    component = main.child?.instance as IntroComponent,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+
+            MainComponent.MainConfig.ChooseFilePair,
+            MainComponent.MainConfig.Alignment,
+            -> {
+                ProjectContainer(
+                    modifier = Modifier.fillMaxSize(),
+                    mainComponent = component,
+                )
+            }
+
+            else -> Unit
         }
     }
 }
@@ -59,12 +65,9 @@ fun MainScreen() {
 @Composable
 internal fun ProjectContainer(
     modifier: Modifier = Modifier,
+    mainComponent: MainComponent,
 ) {
-    val viewModel = AppBusiness.instanceKeeper.getOrCreate {
-        val res: MainViewModel by inject(MainViewModel::class.java)
-        res
-    }
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by mainComponent.uiState.collectAsState()
     val currentFilePairIndex = uiState.currentFilePairIndex
     val currentProject = uiState.project ?: return
 
@@ -78,34 +81,42 @@ internal fun ProjectContainer(
             SideBar(
                 filePairs = uiState.filePairs,
                 onOpenFilePair = {
-                    viewModel.openFilePair(index = it)
+                    mainComponent.openFilePair(index = it)
                 },
             )
 
             Column(
                 modifier = Modifier.weight(1f).padding(end = Spacing.s),
             ) {
-                if (currentFilePairIndex == null) {
-                    ChooseFilePairScreen(
-                        modifier = Modifier.weight(1f).fillMaxWidth(),
-                        filePairs = uiState.filePairs,
-                        onOpenFilePair = {
-                            viewModel.openFilePair(index = it)
-                        },
-                    )
-                } else {
-                    ProjectScreen(
-                        modifier = Modifier.weight(1f).fillMaxWidth(),
-                        project = currentProject,
-                        currentPairIdx = currentFilePairIndex,
-                        openedFilePairs = uiState.openFilePairs,
-                        onSelectFilePair = { index ->
-                            viewModel.selectFilePair(index = index)
-                        },
-                        onCloseFilePair = { index ->
-                            viewModel.closeFilePair(index = index)
-                        },
-                    )
+                val main by mainComponent.main.subscribeAsState()
+                when (main.child?.configuration) {
+                    MainComponent.MainConfig.ChooseFilePair -> {
+                        ChooseFilePairScreen(
+                            modifier = Modifier.weight(1f).fillMaxWidth(),
+                            filePairs = uiState.filePairs,
+                            onOpenFilePair = {
+                                mainComponent.openFilePair(index = it)
+                            },
+                        )
+                    }
+
+                    MainComponent.MainConfig.Alignment -> {
+                        ProjectScreen(
+                            alignComponent = main.child?.instance as AlignComponent,
+                            modifier = Modifier.weight(1f).fillMaxWidth(),
+                            project = currentProject,
+                            currentPairIdx = currentFilePairIndex ?: 0,
+                            openedFilePairs = uiState.openFilePairs,
+                            onSelectFilePair = { index ->
+                                mainComponent.selectFilePair(index = index)
+                            },
+                            onCloseFilePair = { index ->
+                                mainComponent.closeFilePair(index = index)
+                            },
+                        )
+                    }
+
+                    else -> Unit
                 }
             }
         }

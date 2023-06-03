@@ -37,32 +37,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.arkivanov.essenty.instancekeeper.getOrCreate
 import common.ui.components.CustomSpinner
 import common.ui.components.CustomTooltipArea
 import common.ui.theme.Indigo800
 import common.ui.theme.Purple800
 import common.ui.theme.Spacing
-import common.utils.AppBusiness
 import data.ProjectModel
 import localized
-import org.koin.java.KoinJavaComponent
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProjectSegmentationScreen(
+    component: ProjectSegmentationComponent,
     modifier: Modifier = Modifier,
     project: ProjectModel? = null,
 ) {
-    val viewModel: ProjectSegmentationViewModel = AppBusiness.instanceKeeper.getOrCreate {
-        val res: ProjectSegmentationViewModel by KoinJavaComponent.inject(ProjectSegmentationViewModel::class.java)
-        res
-    }
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by component.uiState.collectAsState()
 
     LaunchedEffect(project) {
         if (project != null) {
-            viewModel.load(project)
+            component.load(project)
         }
     }
 
@@ -87,7 +81,7 @@ fun ProjectSegmentationScreen(
                 ),
                 checked = uiState.applyDefaultRules,
                 onCheckedChange = {
-                    viewModel.toggleApplyDefaultRules()
+                    component.toggleApplyDefaultRules()
                 },
             )
         }
@@ -99,7 +93,7 @@ fun ProjectSegmentationScreen(
             current = uiState.currentLanguage?.name,
             onValueChanged = {
                 val lang = availableLanguages[it]
-                viewModel.setCurrentLanguage(lang)
+                component.setCurrentLanguage(lang)
             },
         )
         Spacer(modifier = Modifier.height(Spacing.xs))
@@ -113,7 +107,7 @@ fun ProjectSegmentationScreen(
                 Icon(
                     modifier = iconModifier.onClick {
                         if (buttonEnabled) {
-                            viewModel.createRule()
+                            component.createRule()
                         }
                     },
                     imageVector = Icons.Default.AddCircle,
@@ -168,7 +162,7 @@ fun ProjectSegmentationScreen(
                         pattern = item.before,
                         isEditing = idx == uiState.currentEditedRule,
                         onTextEdited = { text ->
-                            viewModel.editRuleBeforePattern(text = text, index = idx)
+                            component.editRuleBeforePattern(text = text, index = idx)
                         },
                     )
                     SegmentationRuleField(
@@ -177,7 +171,7 @@ fun ProjectSegmentationScreen(
                         pattern = item.after,
                         isEditing = idx == uiState.currentEditedRule,
                         onTextEdited = { text ->
-                            viewModel.editRuleAfterPattern(text = text, index = idx)
+                            component.editRuleAfterPattern(text = text, index = idx)
                         },
                     )
                     Checkbox(
@@ -190,7 +184,7 @@ fun ProjectSegmentationScreen(
                         enabled = !uiState.applyDefaultRules,
                         checked = item.breaking,
                         onCheckedChange = {
-                            viewModel.toggleBreaking(index = idx)
+                            component.toggleBreaking(index = idx)
                         },
                     )
 
@@ -207,7 +201,7 @@ fun ProjectSegmentationScreen(
                             ) {
                                 Icon(
                                     modifier = iconModifier.onClick {
-                                        viewModel.moveRuleUp(index = idx)
+                                        component.moveRuleUp(index = idx)
                                     },
                                     imageVector = Icons.Default.ArrowCircleUp,
                                     contentDescription = null,
@@ -219,7 +213,7 @@ fun ProjectSegmentationScreen(
                             ) {
                                 Icon(
                                     modifier = iconModifier.onClick {
-                                        viewModel.moveRuleDown(index = idx)
+                                        component.moveRuleDown(index = idx)
                                     },
                                     imageVector = Icons.Default.ArrowCircleDown,
                                     contentDescription = null,
@@ -231,7 +225,7 @@ fun ProjectSegmentationScreen(
                             ) {
                                 Icon(
                                     modifier = iconModifier.padding(1.dp)
-                                        .onClick { viewModel.toggleEditRule(index = idx) },
+                                        .onClick { component.toggleEditRule(index = idx) },
                                     imageVector = if (isEditing) {
                                         Icons.Default.EditOff
                                     } else {
@@ -245,7 +239,7 @@ fun ProjectSegmentationScreen(
                                 text = "tooltip_delete".localized(),
                             ) {
                                 Icon(
-                                    modifier = iconModifier.padding(1.dp).onClick { viewModel.deleteRule(index = idx) },
+                                    modifier = iconModifier.padding(1.dp).onClick { component.deleteRule(index = idx) },
                                     imageVector = Icons.Default.Delete,
                                     contentDescription = null,
                                     tint = MaterialTheme.colors.primary,

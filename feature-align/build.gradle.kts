@@ -23,7 +23,8 @@ kotlin {
                 implementation(compose.desktop.currentOs)
 
                 implementation(libs.koin)
-                implementation(libs.essenty.instancekeeper)
+                implementation(libs.decompose)
+                implementation(libs.decompose.extensions)
 
                 implementation(projects.coreCommon)
                 implementation(projects.coreLocalization)
