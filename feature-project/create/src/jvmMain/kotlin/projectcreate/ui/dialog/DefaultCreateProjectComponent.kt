@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import projectmetadata.ui.ProjectMetadataViewModel
+import projectmetadata.ui.ProjectMetadataComponent
 import projectsegmentation.ui.ProjectSegmentationViewModel
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
@@ -45,7 +45,7 @@ internal class DefaultCreateProjectComponent(
         key = "CreateProjectContent",
         childFactory = { config, context ->
             when (config) {
-                CreateProjectComponent.Config.Metadata -> getByInjection<ProjectMetadataViewModel>(
+                CreateProjectComponent.Config.Metadata -> getByInjection<ProjectMetadataComponent>(
                     context,
                     coroutineContext,
                 )
@@ -73,7 +73,7 @@ internal class DefaultCreateProjectComponent(
                     started = SharingStarted.WhileSubscribed(5_000),
                     initialValue = CreateProjectUiState(),
                 )
-                content.asFlow<ProjectMetadataViewModel>(timeout = Duration.INFINITE).filterNotNull().onEach {
+                content.asFlow<ProjectMetadataComponent>(timeout = Duration.INFINITE).filterNotNull().onEach {
                     it.onDone.collect { project ->
                         setProject(project)
                         next()
@@ -102,7 +102,7 @@ internal class DefaultCreateProjectComponent(
 
     override fun submitMetadata() {
         viewModelScope.launch {
-            content.asFlow<ProjectMetadataViewModel>().first()?.submit()
+            content.asFlow<ProjectMetadataComponent>().first()?.submit()
         }
     }
 }

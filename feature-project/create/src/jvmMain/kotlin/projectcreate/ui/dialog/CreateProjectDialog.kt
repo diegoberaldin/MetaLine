@@ -27,6 +27,7 @@ import common.ui.theme.MetaLineTheme
 import common.ui.theme.Spacing
 import data.ProjectModel
 import localized
+import projectmetadata.ui.ProjectMetadataComponent
 import projectmetadata.ui.ProjectMetadataScreen
 import projectsegmentation.ui.ProjectSegmentationScreen
 
@@ -51,11 +52,12 @@ fun CreateProjectDialog(
                     .padding(horizontal = Spacing.s),
             ) {
                 val contentModifier = Modifier.fillMaxWidth().weight(1f).padding(Spacing.xs)
-                val contentState by component.content.subscribeAsState()
-                when (contentState.child?.configuration) {
+                val content by component.content.subscribeAsState()
+                when (content.child?.configuration) {
                     CreateProjectComponent.Config.Metadata -> {
                         ProjectMetadataScreen(
                             modifier = contentModifier,
+                            component = content.child?.instance as ProjectMetadataComponent,
                         )
                     }
 
@@ -87,7 +89,7 @@ fun CreateProjectDialog(
                         modifier = Modifier.heightIn(max = 25.dp),
                         contentPadding = PaddingValues(0.dp),
                         onClick = {
-                            when (contentState.child?.configuration) {
+                            when (content.child?.configuration) {
                                 CreateProjectComponent.Config.Metadata -> {
                                     component.submitMetadata()
                                 }

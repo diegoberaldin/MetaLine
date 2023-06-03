@@ -14,6 +14,7 @@ import common.utils.asFlow
 import common.utils.getByInjection
 import data.ProjectModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,11 +30,12 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import projectmetadata.ui.ProjectMetadataViewModel
+import projectmetadata.ui.ProjectMetadataComponent
 import projectsegmentation.ui.ProjectSegmentationViewModel
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class DefaultEditProjectComponent(
     componentContext: ComponentContext,
     coroutineContext: CoroutineContext,
@@ -51,7 +53,7 @@ internal class DefaultEditProjectComponent(
         key = "EditProjectContentSlow",
         childFactory = { config, context ->
             when (config) {
-                EditProjectComponent.Config.Metadata -> getByInjection<ProjectMetadataViewModel>(
+                EditProjectComponent.Config.Metadata -> getByInjection<ProjectMetadataComponent>(
                     context,
                     coroutineContext,
                 )
@@ -87,12 +89,12 @@ internal class DefaultEditProjectComponent(
                     started = SharingStarted.WhileSubscribed(5_000),
                     initialValue = EditProjectUiState(),
                 )
-                onDone = content.asFlow<ProjectMetadataViewModel>(timeout = Duration.INFINITE)
+                onDone = content.asFlow<ProjectMetadataComponent>(timeout = Duration.INFINITE)
                     .flatMapLatest { it?.onDone ?: snapshotFlow { null } }
                     .shareIn(viewModelScope, started = SharingStarted.WhileSubscribed(5_000))
 
                 contentNavigation.activate(EditProjectComponent.Config.Metadata)
-                content.asFlow<ProjectMetadataViewModel>(timeout = Duration.INFINITE).filterNotNull().onEach {
+                content.asFlow<ProjectMetadataComponent>(timeout = Duration.INFINITE).filterNotNull().onEach {
                     it.load(project)
                 }.launchIn(viewModelScope)
             }
@@ -106,7 +108,7 @@ internal class DefaultEditProjectComponent(
         if (!::viewModelScope.isInitialized) return
 
         viewModelScope.launch {
-            val first = content.asFlow<ProjectMetadataViewModel>().first()
+            val first = content.asFlow<ProjectMetadataComponent>().first()
             first?.load(value)
         }
     }
@@ -128,7 +130,7 @@ internal class DefaultEditProjectComponent(
 
     override fun submitMetadata() {
         viewModelScope.launch {
-            content.asFlow<ProjectMetadataViewModel>().first()?.submit()
+            content.asFlow<ProjectMetadataComponent>().first()?.submit()
         }
     }
 }

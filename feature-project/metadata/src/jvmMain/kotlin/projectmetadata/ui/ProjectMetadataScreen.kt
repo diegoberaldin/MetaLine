@@ -16,29 +16,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.arkivanov.essenty.instancekeeper.getOrCreate
 import common.ui.components.CustomOpenFileDialog
 import common.ui.components.CustomTextField
 import common.ui.theme.Spacing
-import common.utils.AppBusiness
 import localized
-import org.koin.java.KoinJavaComponent
 import projectmetadata.ui.components.FilePairSelector
 import projectmetadata.ui.components.LanguagesSelector
 
 @Composable
 fun ProjectMetadataScreen(
+    component: ProjectMetadataComponent,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: ProjectMetadataViewModel = AppBusiness.instanceKeeper.getOrCreate {
-        val res: ProjectMetadataViewModel by KoinJavaComponent.inject(ProjectMetadataViewModel::class.java)
-        res
-    }
-
-    val uiState by viewModel.uiState.collectAsState()
-    val errorState by viewModel.errorUiState.collectAsState()
-    val languageState by viewModel.languagesUiState.collectAsState()
-    val fileState by viewModel.fileUiState.collectAsState()
+    val uiState by component.uiState.collectAsState()
+    val errorState by component.errorUiState.collectAsState()
+    val languageState by component.languagesUiState.collectAsState()
+    val fileState by component.fileUiState.collectAsState()
     var pickSourceDialogOpen by remember {
         mutableStateOf(false)
     }
@@ -56,7 +49,7 @@ fun ProjectMetadataScreen(
             value = uiState.name,
             singleLine = true,
             onValueChange = {
-                viewModel.setName(it)
+                component.setName(it)
             },
         )
         Text(
@@ -76,10 +69,10 @@ fun ProjectMetadataScreen(
             sourceLanguage = languageState.sourceLanguage,
             targetLanguage = languageState.targetLanguage,
             onSourceSelected = {
-                viewModel.setSourceLanguage(it)
+                component.setSourceLanguage(it)
             },
             onTargetSelected = {
-                viewModel.setTargetLanguage(it)
+                component.setTargetLanguage(it)
             },
         )
         Text(
@@ -105,16 +98,16 @@ fun ProjectMetadataScreen(
             targetFiles = fileState.targetFiles,
             selectedSource = fileState.selectedSource,
             selectedTarget = fileState.selectedTarget,
-            onSelectSourceFile = { viewModel.selectSourceFile(it) },
-            onSelectTargetFile = { viewModel.selectTargetFile(it) },
+            onSelectSourceFile = { component.selectSourceFile(it) },
+            onSelectTargetFile = { component.selectTargetFile(it) },
             onAddSource = { pickSourceDialogOpen = true },
             onAddTarget = { pickTargetDialogOpen = true },
-            onMoveUpSource = { viewModel.moveSourceUp() },
-            onMoveDownSource = { viewModel.moveSourceDown() },
-            onMoveUpTarget = { viewModel.moveTargetUp() },
-            onMoveDownTarget = { viewModel.moveTargetDown() },
-            onDeleteSource = { viewModel.deleteSourceFile() },
-            onDeleteTarget = { viewModel.deleteTargetFile() },
+            onMoveUpSource = { component.moveSourceUp() },
+            onMoveDownSource = { component.moveSourceDown() },
+            onMoveUpTarget = { component.moveTargetUp() },
+            onMoveDownTarget = { component.moveTargetDown() },
+            onDeleteSource = { component.deleteSourceFile() },
+            onDeleteTarget = { component.deleteTargetFile() },
         )
         Text(
             modifier = Modifier.padding(horizontal = Spacing.xs),
@@ -130,7 +123,7 @@ fun ProjectMetadataScreen(
             nameFilter = { it.endsWith(".txt") },
             onCloseRequest = { path ->
                 path?.also {
-                    viewModel.addSourceFile(it)
+                    component.addSourceFile(it)
                 }
                 pickSourceDialogOpen = false
             },
@@ -142,7 +135,7 @@ fun ProjectMetadataScreen(
             nameFilter = { it.endsWith(".txt") },
             onCloseRequest = { path ->
                 path?.also {
-                    viewModel.addTargetFile(it)
+                    component.addTargetFile(it)
                 }
                 pickTargetDialogOpen = false
             },

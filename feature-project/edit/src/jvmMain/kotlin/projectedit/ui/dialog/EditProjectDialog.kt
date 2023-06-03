@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.rememberWindowState
+import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import common.ui.components.CustomTabBar
 import common.ui.theme.MetaLineTheme
 import common.ui.theme.SelectedBackground
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import localized
+import projectmetadata.ui.ProjectMetadataComponent
 import projectmetadata.ui.ProjectMetadataScreen
 import projectsegmentation.ui.ProjectSegmentationScreen
 
@@ -51,6 +53,7 @@ fun EditProjectDialog(
         }
     }
     val uiState by component.uiState.collectAsState()
+    val content by component.content.subscribeAsState()
 
     LaunchedEffect(component) {
         component.onDone.onEach {
@@ -98,7 +101,10 @@ fun EditProjectDialog(
                         project = project,
                     )
 
-                    else -> ProjectMetadataScreen(modifier = bottomModifier)
+                    else -> ProjectMetadataScreen(
+                        component = content.child?.instance as ProjectMetadataComponent,
+                        modifier = bottomModifier,
+                    )
                 }
                 Row(
                     modifier = Modifier.padding(Spacing.s),
