@@ -20,7 +20,7 @@ import localized
 import usecase.GetCompleteLanguageUseCase
 import kotlin.coroutines.CoroutineContext
 
-class DefaultSettingsGeneralComponent(
+internal class DefaultSettingsGeneralComponent(
     componentContext: ComponentContext,
     coroutineContext: CoroutineContext,
     private val dispatcherProvider: CoroutineDispatcherProvider,

@@ -33,26 +33,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.arkivanov.essenty.instancekeeper.getOrCreate
 import common.ui.components.CustomSpinner
 import common.ui.components.CustomTooltipArea
 import common.ui.theme.Indigo800
 import common.ui.theme.Purple800
 import common.ui.theme.Spacing
-import common.utils.AppBusiness
 import localized
-import org.koin.java.KoinJavaComponent.inject
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SettingsSegmentationScreen(
+    component: SettingsSegmentationComponent,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel = AppBusiness.instanceKeeper.getOrCreate {
-        val res: SettingsSegmentationViewModel by inject(SettingsSegmentationViewModel::class.java)
-        res
-    }
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by component.uiState.collectAsState()
 
     Column(
         modifier = modifier.padding(vertical = Spacing.m, horizontal = Spacing.s),
@@ -71,7 +65,7 @@ fun SettingsSegmentationScreen(
             current = uiState.currentLanguage?.name,
             onValueChanged = {
                 val lang = availableLanguages[it]
-                viewModel.setCurrentLanguage(lang)
+                component.setCurrentLanguage(lang)
             },
         )
         Spacer(modifier = Modifier.height(Spacing.xs))
@@ -82,7 +76,7 @@ fun SettingsSegmentationScreen(
                 text = "tooltip_add".localized(),
             ) {
                 Icon(
-                    modifier = iconModifier.onClick { viewModel.createRule() },
+                    modifier = iconModifier.onClick { component.createRule() },
                     imageVector = Icons.Default.AddCircle,
                     contentDescription = null,
                     tint = MaterialTheme.colors.primary,
@@ -129,7 +123,7 @@ fun SettingsSegmentationScreen(
                         pattern = item.before,
                         isEditing = idx == uiState.currentEditedRule,
                         onTextEdited = { text ->
-                            viewModel.editRuleBeforePattern(text = text, index = idx)
+                            component.editRuleBeforePattern(text = text, index = idx)
                         },
                     )
                     SegmentationRuleField(
@@ -138,7 +132,7 @@ fun SettingsSegmentationScreen(
                         pattern = item.after,
                         isEditing = idx == uiState.currentEditedRule,
                         onTextEdited = { text ->
-                            viewModel.editRuleAfterPattern(text = text, index = idx)
+                            component.editRuleAfterPattern(text = text, index = idx)
                         },
                     )
                     Checkbox(
@@ -150,7 +144,7 @@ fun SettingsSegmentationScreen(
                         ),
                         checked = item.breaking,
                         onCheckedChange = {
-                            viewModel.toggleBreaking(index = idx)
+                            component.toggleBreaking(index = idx)
                         },
                     )
 
@@ -162,7 +156,7 @@ fun SettingsSegmentationScreen(
                         ) {
                             Icon(
                                 modifier = iconModifier.onClick {
-                                    viewModel.moveRuleUp(index = idx)
+                                    component.moveRuleUp(index = idx)
                                 },
                                 imageVector = Icons.Default.ArrowCircleUp,
                                 contentDescription = null,
@@ -174,7 +168,7 @@ fun SettingsSegmentationScreen(
                         ) {
                             Icon(
                                 modifier = iconModifier.onClick {
-                                    viewModel.moveRuleDown(index = idx)
+                                    component.moveRuleDown(index = idx)
                                 },
                                 imageVector = Icons.Default.ArrowCircleDown,
                                 contentDescription = null,
@@ -185,7 +179,7 @@ fun SettingsSegmentationScreen(
                             text = "tooltip_edit".localized(),
                         ) {
                             Icon(
-                                modifier = iconModifier.padding(1.dp).onClick { viewModel.toggleEditRule(index = idx) },
+                                modifier = iconModifier.padding(1.dp).onClick { component.toggleEditRule(index = idx) },
                                 imageVector = if (isEditing) {
                                     Icons.Default.EditOff
                                 } else {
@@ -199,7 +193,7 @@ fun SettingsSegmentationScreen(
                             text = "tooltip_delete".localized(),
                         ) {
                             Icon(
-                                modifier = iconModifier.padding(1.dp).onClick { viewModel.deleteRule(index = idx) },
+                                modifier = iconModifier.padding(1.dp).onClick { component.deleteRule(index = idx) },
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = null,
                                 tint = MaterialTheme.colors.primary,

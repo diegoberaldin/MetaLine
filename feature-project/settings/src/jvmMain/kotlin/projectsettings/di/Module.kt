@@ -5,7 +5,8 @@ import projectsettings.ui.dialog.DefaultSettingsComponent
 import projectsettings.ui.dialog.SettingsComponent
 import projectsettings.ui.general.DefaultSettingsGeneralComponent
 import projectsettings.ui.general.SettingsGeneralComponent
-import projectsettings.ui.segmentation.SettingsSegmentationViewModel
+import projectsettings.ui.segmentation.DefaultSettingsSegmentationComponent
+import projectsettings.ui.segmentation.SettingsSegmentationComponent
 
 val projectSettingsModule = module {
     factory<SettingsComponent> {
@@ -24,8 +25,10 @@ val projectSettingsModule = module {
             keyStore = get(),
         )
     }
-    factory {
-        SettingsSegmentationViewModel(
+    factory<SettingsSegmentationComponent> {
+        DefaultSettingsSegmentationComponent(
+            componentContext = it[0],
+            coroutineContext = it[1],
             dispatcherProvider = get(),
             segmentationRuleRepository = get(),
             languageRepository = get(),

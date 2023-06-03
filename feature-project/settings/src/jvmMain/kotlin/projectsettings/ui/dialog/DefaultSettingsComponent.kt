@@ -19,10 +19,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import projectsettings.ui.general.SettingsGeneralComponent
-import projectsettings.ui.segmentation.SettingsSegmentationViewModel
+import projectsettings.ui.segmentation.SettingsSegmentationComponent
 import kotlin.coroutines.CoroutineContext
 
-class DefaultSettingsComponent(
+internal class DefaultSettingsComponent(
     componentContext: ComponentContext,
     coroutineContext: CoroutineContext,
     private val dispatcherProvider: CoroutineDispatcherProvider,
@@ -44,7 +44,7 @@ class DefaultSettingsComponent(
                     coroutineContext,
                 )
 
-                SettingsComponent.Config.Segmentation -> getByInjection<SettingsSegmentationViewModel>(
+                SettingsComponent.Config.Segmentation -> getByInjection<SettingsSegmentationComponent>(
                     context,
                     coroutineContext,
                 )

@@ -32,6 +32,7 @@ import common.ui.theme.Spacing
 import localized
 import projectsettings.ui.general.SettingsGeneralComponent
 import projectsettings.ui.general.SettingsGeneralScreen
+import projectsettings.ui.segmentation.SettingsSegmentationComponent
 import projectsettings.ui.segmentation.SettingsSegmentationScreen
 
 @Composable
@@ -83,7 +84,11 @@ fun SettingsDialog(
                         modifier = bottomModifier,
                     )
 
-                    SettingsComponent.Config.Segmentation -> SettingsSegmentationScreen(modifier = bottomModifier)
+                    SettingsComponent.Config.Segmentation -> SettingsSegmentationScreen(
+                        component = content.child?.instance as SettingsSegmentationComponent,
+                        modifier = bottomModifier,
+                    )
+
                     else -> Unit
                 }
 
