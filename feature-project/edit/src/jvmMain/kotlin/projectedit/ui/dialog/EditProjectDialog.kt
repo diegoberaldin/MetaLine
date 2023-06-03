@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 import localized
 import projectmetadata.ui.ProjectMetadataComponent
 import projectmetadata.ui.ProjectMetadataScreen
+import projectsegmentation.ui.ProjectSegmentationComponent
 import projectsegmentation.ui.ProjectSegmentationScreen
 
 @Composable
@@ -95,16 +96,19 @@ fun EditProjectDialog(
                             else -> RoundedCornerShape(4.dp)
                         },
                     ).padding(horizontal = Spacing.s)
-                when (uiState.currentTab) {
-                    EditProjectSection.SEGMENTATION_RULES -> ProjectSegmentationScreen(
+                when (content.child?.configuration) {
+                    EditProjectComponent.Config.SegmentationRules -> ProjectSegmentationScreen(
+                        component = content.child?.instance as ProjectSegmentationComponent,
                         modifier = bottomModifier,
                         project = project,
                     )
 
-                    else -> ProjectMetadataScreen(
+                    EditProjectComponent.Config.Metadata -> ProjectMetadataScreen(
                         component = content.child?.instance as ProjectMetadataComponent,
                         modifier = bottomModifier,
                     )
+
+                    else -> Unit
                 }
                 Row(
                     modifier = Modifier.padding(Spacing.s),

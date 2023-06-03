@@ -29,6 +29,7 @@ import data.ProjectModel
 import localized
 import projectmetadata.ui.ProjectMetadataComponent
 import projectmetadata.ui.ProjectMetadataScreen
+import projectsegmentation.ui.ProjectSegmentationComponent
 import projectsegmentation.ui.ProjectSegmentationScreen
 
 @Composable
@@ -63,6 +64,7 @@ fun CreateProjectDialog(
 
                     CreateProjectComponent.Config.SegmentationRules -> {
                         ProjectSegmentationScreen(
+                            component = content.child?.instance as ProjectSegmentationComponent,
                             modifier = contentModifier,
                             project = uiState.project,
                         )

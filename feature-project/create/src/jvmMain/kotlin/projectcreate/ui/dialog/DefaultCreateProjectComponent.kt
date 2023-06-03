@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import projectmetadata.ui.ProjectMetadataComponent
-import projectsegmentation.ui.ProjectSegmentationViewModel
+import projectsegmentation.ui.ProjectSegmentationComponent
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 
@@ -50,7 +50,7 @@ internal class DefaultCreateProjectComponent(
                     coroutineContext,
                 )
 
-                CreateProjectComponent.Config.SegmentationRules -> getByInjection<ProjectSegmentationViewModel>(
+                CreateProjectComponent.Config.SegmentationRules -> getByInjection<ProjectSegmentationComponent>(
                     context,
                     coroutineContext,
                 )

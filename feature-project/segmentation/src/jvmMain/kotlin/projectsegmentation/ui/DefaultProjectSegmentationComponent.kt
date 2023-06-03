@@ -1,6 +1,8 @@
 package projectsegmentation.ui
 
-import com.arkivanov.essenty.instancekeeper.InstanceKeeper
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.lifecycle.doOnCreate
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 import common.coroutines.CoroutineDispatcherProvider
 import data.LanguageModel
 import data.ProjectModel
@@ -10,6 +12,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.stateIn
@@ -17,47 +20,58 @@ import kotlinx.coroutines.launch
 import repository.ProjectRepository
 import repository.SegmentationRuleRepository
 import usecase.GetCompleteLanguageUseCase
+import kotlin.coroutines.CoroutineContext
 
-class ProjectSegmentationViewModel(
+internal class DefaultProjectSegmentationComponent(
+    componentContext: ComponentContext,
+    coroutineContext: CoroutineContext,
     private val dispatcherProvider: CoroutineDispatcherProvider,
     private val segmentationRuleRepository: SegmentationRuleRepository,
     private val projectRepository: ProjectRepository,
     private val completeLanguage: GetCompleteLanguageUseCase,
-) : InstanceKeeper.Instance {
+) : ProjectSegmentationComponent, ComponentContext by componentContext {
 
     private val applyDefaultRules = MutableStateFlow(true)
     private val rules = MutableStateFlow<List<SegmentationRuleModel>>(emptyList())
     private val availableLanguages = MutableStateFlow<List<LanguageModel>>(emptyList())
     private val currentLanguage = MutableStateFlow<LanguageModel?>(null)
     private val currentEditedRule = MutableStateFlow<Int?>(null)
-    private val viewModelScope = CoroutineScope(SupervisorJob())
+    private lateinit var viewModelScope: CoroutineScope
     private var projectId: Int = 0
 
-    val uiState = combine(
-        applyDefaultRules,
-        currentLanguage,
-        availableLanguages,
-        rules,
-        currentEditedRule,
-    ) { applyDefaultRules, currentLanguage, availableLanguages, rules, currentEditedRule ->
-        ProjectSegmentationUiState(
-            applyDefaultRules = applyDefaultRules,
-            currentLanguage = currentLanguage,
-            availableLanguages = availableLanguages,
-            rules = rules,
-            currentEditedRule = currentEditedRule,
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = ProjectSegmentationUiState(),
-    )
+    override lateinit var uiState: StateFlow<ProjectSegmentationUiState>
 
-    override fun onDestroy() {
-        viewModelScope.cancel()
+    init {
+        with(lifecycle) {
+            doOnCreate {
+                viewModelScope = CoroutineScope(coroutineContext + SupervisorJob())
+                uiState = combine(
+                    applyDefaultRules,
+                    currentLanguage,
+                    availableLanguages,
+                    rules,
+                    currentEditedRule,
+                ) { applyDefaultRules, currentLanguage, availableLanguages, rules, currentEditedRule ->
+                    ProjectSegmentationUiState(
+                        applyDefaultRules = applyDefaultRules,
+                        currentLanguage = currentLanguage,
+                        availableLanguages = availableLanguages,
+                        rules = rules,
+                        currentEditedRule = currentEditedRule,
+                    )
+                }.stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5_000),
+                    initialValue = ProjectSegmentationUiState(),
+                )
+            }
+            doOnDestroy {
+                viewModelScope.cancel()
+            }
+        }
     }
 
-    fun load(project: ProjectModel) {
+    override fun load(project: ProjectModel) {
         projectId = project.id
 
         val projectLanguages = listOf(project.sourceLang, project.targetLang)
@@ -72,14 +86,14 @@ class ProjectSegmentationViewModel(
         applyDefaultRules.value = project.applyDefaultSegmentationRules
     }
 
-    fun setCurrentLanguage(lang: LanguageModel) {
+    override fun setCurrentLanguage(lang: LanguageModel) {
         currentLanguage.value = lang
         viewModelScope.launch(dispatcherProvider.io) {
             refreshRules()
         }
     }
 
-    fun deleteRule(index: Int) {
+    override fun deleteRule(index: Int) {
         val rule = rules.value[index]
         viewModelScope.launch(dispatcherProvider.io) {
             segmentationRuleRepository.delete(rule)
@@ -87,7 +101,7 @@ class ProjectSegmentationViewModel(
         }
     }
 
-    fun createRule() {
+    override fun createRule() {
         viewModelScope.launch(dispatcherProvider.io) {
             val newRule = SegmentationRuleModel()
             val id = segmentationRuleRepository.create(model = newRule, projectId = projectId)
@@ -101,7 +115,7 @@ class ProjectSegmentationViewModel(
         }
     }
 
-    fun toggleEditRule(index: Int) {
+    override fun toggleEditRule(index: Int) {
         viewModelScope.launch(dispatcherProvider.io) {
             currentEditedRule.getAndUpdate { oldIndex ->
                 if (oldIndex != null) {
@@ -118,7 +132,7 @@ class ProjectSegmentationViewModel(
         }
     }
 
-    fun editRuleBeforePattern(text: String, index: Int) {
+    override fun editRuleBeforePattern(text: String, index: Int) {
         rules.getAndUpdate { oldList ->
             oldList.mapIndexed { idx, rule ->
                 if (idx != index) {
@@ -130,7 +144,7 @@ class ProjectSegmentationViewModel(
         }
     }
 
-    fun editRuleAfterPattern(text: String, index: Int) {
+    override fun editRuleAfterPattern(text: String, index: Int) {
         rules.getAndUpdate { oldList ->
             oldList.mapIndexed { idx, rule ->
                 if (idx != index) {
@@ -142,7 +156,7 @@ class ProjectSegmentationViewModel(
         }
     }
 
-    fun toggleBreaking(index: Int) {
+    override fun toggleBreaking(index: Int) {
         rules.getAndUpdate { oldList ->
             oldList.mapIndexed { idx, rule ->
                 if (idx != index) {
@@ -154,7 +168,7 @@ class ProjectSegmentationViewModel(
         }
     }
 
-    fun moveRuleUp(index: Int) {
+    override fun moveRuleUp(index: Int) {
         if (index <= 0) {
             return
         }
@@ -169,7 +183,7 @@ class ProjectSegmentationViewModel(
         updatePositions()
     }
 
-    fun moveRuleDown(index: Int) {
+    override fun moveRuleDown(index: Int) {
         if (index >= rules.value.size - 1) {
             return
         }
@@ -196,7 +210,7 @@ class ProjectSegmentationViewModel(
         }
     }
 
-    fun toggleApplyDefaultRules() {
+    override fun toggleApplyDefaultRules() {
         val newValue = !applyDefaultRules.value
         applyDefaultRules.value = newValue
         val projectLanguages = availableLanguages.value.map { it.code }
