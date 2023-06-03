@@ -42,6 +42,7 @@ import projectcreate.ui.dialog.CreateProjectDialog
 import projectedit.ui.dialog.EditProjectComponent
 import projectedit.ui.dialog.EditProjectDialog
 import projectsettings.ui.dialog.SettingsDialog
+import projectstatistics.ui.dialog.StatisticsComponent
 import projectstatistics.ui.dialog.StatisticsDialog
 import repository.repositoryModule
 import root.RootComponent
@@ -170,6 +171,7 @@ fun main() {
 
                 RootComponent.DialogConfig.Statistics -> currentProject?.also {
                     StatisticsDialog(
+                        component = dialogState.child?.instance as StatisticsComponent,
                         project = it,
                         onClose = {
                             rootComponent.closeDialog()

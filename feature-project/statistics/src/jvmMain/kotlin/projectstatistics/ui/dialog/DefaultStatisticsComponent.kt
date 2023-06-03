@@ -1,6 +1,8 @@
 package projectstatistics.ui.dialog
 
-import com.arkivanov.essenty.instancekeeper.InstanceKeeper
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.lifecycle.doOnCreate
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 import common.coroutines.CoroutineDispatcherProvider
 import data.ProjectModel
 import data.SegmentModel
@@ -9,6 +11,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -16,33 +19,44 @@ import kotlinx.coroutines.launch
 import localized
 import repository.FilePairRepository
 import repository.SegmentRepository
+import kotlin.coroutines.CoroutineContext
 
-class StatisticsViewModel(
+internal class DefaultStatisticsComponent(
+    componentContext: ComponentContext,
+    coroutineContext: CoroutineContext,
     private val dispatcherProvider: CoroutineDispatcherProvider,
     private val filePairRepository: FilePairRepository,
     private val segmentRepository: SegmentRepository,
-) : InstanceKeeper.Instance {
+) : StatisticsComponent, ComponentContext by componentContext {
 
     private val items = MutableStateFlow<List<StatisticsItem>>(emptyList())
     private val loading = MutableStateFlow(false)
-    private val viewModelScope = CoroutineScope(SupervisorJob())
+    private lateinit var viewModelScope: CoroutineScope
 
-    val uiState = combine(items, loading) { items, loading ->
-        StatisticsUiState(
-            items = items,
-            loading = loading,
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = StatisticsUiState(),
-    )
+    override lateinit var uiState: StateFlow<StatisticsUiState>
 
-    override fun onDestroy() {
-        viewModelScope.cancel()
+    init {
+        with(lifecycle) {
+            doOnCreate {
+                viewModelScope = CoroutineScope(coroutineContext + SupervisorJob())
+                uiState = combine(items, loading) { items, loading ->
+                    StatisticsUiState(
+                        items = items,
+                        loading = loading,
+                    )
+                }.stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5000),
+                    initialValue = StatisticsUiState(),
+                )
+            }
+            doOnDestroy {
+                viewModelScope.cancel()
+            }
+        }
     }
 
-    fun load(project: ProjectModel) {
+    override fun load(project: ProjectModel) {
         val projectId = project.id
         loading.value = true
         viewModelScope.launch(dispatcherProvider.io) {
