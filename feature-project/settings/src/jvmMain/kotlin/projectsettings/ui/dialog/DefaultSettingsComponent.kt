@@ -8,7 +8,6 @@ import com.arkivanov.decompose.router.slot.childSlot
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.doOnCreate
 import com.arkivanov.essenty.lifecycle.doOnDestroy
-import com.arkivanov.essenty.lifecycle.doOnStart
 import common.coroutines.CoroutineDispatcherProvider
 import common.utils.getByInjection
 import kotlinx.coroutines.CoroutineScope
@@ -19,8 +18,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import projectsettings.ui.general.SettingsGeneralViewModel
+import projectsettings.ui.general.SettingsGeneralComponent
 import projectsettings.ui.segmentation.SettingsSegmentationViewModel
 import kotlin.coroutines.CoroutineContext
 
@@ -41,7 +39,7 @@ class DefaultSettingsComponent(
         key = "SettingsContentSlot",
         childFactory = { config, context ->
             when (config) {
-                SettingsComponent.Config.General -> getByInjection<SettingsGeneralViewModel>(
+                SettingsComponent.Config.General -> getByInjection<SettingsGeneralComponent>(
                     context,
                     coroutineContext,
                 )
@@ -57,11 +55,13 @@ class DefaultSettingsComponent(
     init {
         with(lifecycle) {
             doOnCreate {
+                viewModelScope = CoroutineScope(coroutineContext + SupervisorJob())
+
                 tabs.value = listOf(
                     SettingsTab.GENERAL,
                     SettingsTab.SEGMENTATION_RULES,
                 )
-                viewModelScope = CoroutineScope(coroutineContext + SupervisorJob())
+
                 uiState = combine(
                     tabs,
                     currentTab,
@@ -75,8 +75,7 @@ class DefaultSettingsComponent(
                     started = SharingStarted.WhileSubscribed(5_000),
                     initialValue = SettingsUiState(),
                 )
-            }
-            doOnStart {
+
                 selectTab(SettingsTab.GENERAL)
             }
             doOnDestroy {
@@ -87,11 +86,9 @@ class DefaultSettingsComponent(
 
     override fun selectTab(value: SettingsTab) {
         currentTab.value = value
-        viewModelScope.launch(dispatcherProvider.main) {
-            when (value) {
-                SettingsTab.GENERAL -> contentNavigation.activate(SettingsComponent.Config.General)
-                SettingsTab.SEGMENTATION_RULES -> contentNavigation.activate(SettingsComponent.Config.Segmentation)
-            }
+        when (value) {
+            SettingsTab.GENERAL -> contentNavigation.activate(SettingsComponent.Config.General)
+            SettingsTab.SEGMENTATION_RULES -> contentNavigation.activate(SettingsComponent.Config.Segmentation)
         }
     }
 }

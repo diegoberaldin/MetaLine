@@ -30,6 +30,7 @@ import common.ui.theme.MetaLineTheme
 import common.ui.theme.SelectedBackground
 import common.ui.theme.Spacing
 import localized
+import projectsettings.ui.general.SettingsGeneralComponent
 import projectsettings.ui.general.SettingsGeneralScreen
 import projectsettings.ui.segmentation.SettingsSegmentationScreen
 
@@ -77,7 +78,11 @@ fun SettingsDialog(
                 )
 
                 when (content.child?.configuration) {
-                    SettingsComponent.Config.General -> SettingsGeneralScreen(modifier = bottomModifier)
+                    SettingsComponent.Config.General -> SettingsGeneralScreen(
+                        component = content.child?.instance as SettingsGeneralComponent,
+                        modifier = bottomModifier,
+                    )
+
                     SettingsComponent.Config.Segmentation -> SettingsSegmentationScreen(modifier = bottomModifier)
                     else -> Unit
                 }
