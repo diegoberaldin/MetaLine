@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import main.ui.MainComponent
 import projectcreate.ui.dialog.CreateProjectComponent
 import projectedit.ui.dialog.EditProjectComponent
+import projectsettings.ui.dialog.SettingsComponent
 import projectstatistics.ui.dialog.StatisticsComponent
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
@@ -64,6 +65,10 @@ internal class DefaultRootComponent(
 
                 RootComponent.DialogConfig.Statistics -> {
                     getByInjection<StatisticsComponent>(context, coroutineContext)
+                }
+
+                RootComponent.DialogConfig.Settings -> {
+                    getByInjection<SettingsComponent>(context, coroutineContext)
                 }
 
                 else -> Unit

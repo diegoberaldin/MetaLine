@@ -24,25 +24,20 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.rememberWindowState
-import com.arkivanov.essenty.instancekeeper.getOrCreate
+import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import common.ui.components.CustomTabBar
 import common.ui.theme.MetaLineTheme
 import common.ui.theme.SelectedBackground
 import common.ui.theme.Spacing
-import common.utils.AppBusiness
 import localized
-import org.koin.java.KoinJavaComponent.inject
 import projectsettings.ui.general.SettingsGeneralScreen
 import projectsettings.ui.segmentation.SettingsSegmentationScreen
 
 @Composable
 fun SettingsDialog(
+    component: SettingsComponent,
     onClose: (() -> Unit)? = null,
 ) {
-    val viewModel: SettingsViewModel = AppBusiness.instanceKeeper.getOrCreate {
-        val res: SettingsViewModel by inject(SettingsViewModel::class.java)
-        res
-    }
     val lang by L10n.currentLanguage.collectAsState("lang".localized())
     LaunchedEffect(lang) {}
 
@@ -55,7 +50,8 @@ fun SettingsDialog(
                 onClose?.invoke()
             },
         ) {
-            val uiState by viewModel.uiState.collectAsState()
+            val uiState by component.uiState.collectAsState()
+            val content by component.content.subscribeAsState()
 
             Column(
                 modifier = Modifier.size(600.dp, 400.dp)
@@ -69,7 +65,7 @@ fun SettingsDialog(
                     tabs = tabs.map { it.toReadableName() },
                     current = tabIndex,
                     onTabSelected = {
-                        viewModel.selectTab(tabs[it])
+                        component.selectTab(tabs[it])
                     },
                 )
                 val bottomModifier = Modifier.fillMaxWidth().weight(1f).background(
@@ -79,9 +75,11 @@ fun SettingsDialog(
                         else -> RoundedCornerShape(4.dp)
                     },
                 )
-                when (uiState.currentTab) {
-                    SettingsTab.SEGMENTATION_RULES -> SettingsSegmentationScreen(modifier = bottomModifier)
-                    else -> SettingsGeneralScreen(modifier = bottomModifier)
+
+                when (content.child?.configuration) {
+                    SettingsComponent.Config.General -> SettingsGeneralScreen(modifier = bottomModifier)
+                    SettingsComponent.Config.Segmentation -> SettingsSegmentationScreen(modifier = bottomModifier)
+                    else -> Unit
                 }
 
                 Row(

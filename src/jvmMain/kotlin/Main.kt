@@ -41,6 +41,7 @@ import projectcreate.ui.dialog.CreateProjectComponent
 import projectcreate.ui.dialog.CreateProjectDialog
 import projectedit.ui.dialog.EditProjectComponent
 import projectedit.ui.dialog.EditProjectDialog
+import projectsettings.ui.dialog.SettingsComponent
 import projectsettings.ui.dialog.SettingsDialog
 import projectstatistics.ui.dialog.StatisticsComponent
 import projectstatistics.ui.dialog.StatisticsDialog
@@ -164,6 +165,7 @@ fun main() {
                 )
 
                 RootComponent.DialogConfig.Settings -> SettingsDialog(
+                    component = dialogState.child?.instance as SettingsComponent,
                     onClose = {
                         rootComponent.closeDialog()
                     },
