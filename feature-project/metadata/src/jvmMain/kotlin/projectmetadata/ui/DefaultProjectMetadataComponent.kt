@@ -129,6 +129,8 @@ internal class DefaultProjectMetadataComponent(
                     started = SharingStarted.WhileSubscribed(5_000),
                     initialValue = CreateProjectErrorState(),
                 )
+
+                refreshAvailableLanguages()
             }
             doOnDestroy {
                 viewModelScope.cancel()
